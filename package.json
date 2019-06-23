@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel --presets es2015 -d app/ src && node app/server.js"
+    "dev": "nodemon src --exec babel --presets es2015 -w src/ --out-dir app/"
   },
   "keywords": [
     "Management",
