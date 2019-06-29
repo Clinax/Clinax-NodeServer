@@ -44,10 +44,7 @@ var patientSchema = Schema({
         max: 110,
     },
     medicalNote: String,
-    bloodGroup: {
-        type: String,
-        enum: MetaSchema.bloodGroups
-    },
+    bloodGroup: MetaSchema.bloodGroups,
     emergencyContact: {
         name: String,
         phoneNumber: Number,
@@ -57,6 +54,10 @@ var patientSchema = Schema({
     cases: [CaseSchema]
 }, {
     timestamps: true
+});
+
+patientSchema.index({
+    '$**': 'text'
 });
 
 patientSchema.virtual('fullName')

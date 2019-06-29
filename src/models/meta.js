@@ -1,6 +1,19 @@
+import {
+    nLength
+} from "../utils";
+
 export default {
     addressSchema: {
-        streetAddress: String
+        streetAddress: String,
+        city: String,
+        State: String,
+        pincode: {
+            type: Number,
+            validate: (v) => nLength(v) == 6,
+        }
     },
-    bloodGroups: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-"]
+    bloodGroups: {
+        type: String,
+        enum: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-"]
+    }
 }

@@ -1,6 +1,7 @@
 import {
     UserController,
-    PatientController
+    PatientController,
+    Controller
 } from '../controllers';
 
 export default (app) => {
@@ -19,4 +20,7 @@ export default (app) => {
 
     app.get("/patient", PatientController.findAll);
     app.post("/patient", PatientController.create);
+
+    // Misc routes
+    app.get("/search/:keyword", Controller.search)
 }
