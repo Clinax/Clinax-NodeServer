@@ -5,9 +5,11 @@ import {
 	json
 } from 'body-parser';
 
+import "./init"
 import {
 	mongoose
 } from "./config/database.config";
+import config from './config/index.js';
 
 
 const app = express();
@@ -19,6 +21,6 @@ app.use(urlencoded({
 
 routes(app);
 // listen for requests
-app.listen(3000, () => {
+app.listen(config.port, () => {
 	console.log("Server is listening on port 3000");
 });
