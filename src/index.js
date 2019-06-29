@@ -4,6 +4,7 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
+import requestIp from 'request-ip';
 import {
 	urlencoded,
 	json
@@ -27,6 +28,7 @@ app.use(urlencoded({
 	extended: true
 }));
 
+app.use(requestIp.mw());
 
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
@@ -45,6 +47,7 @@ app.use(cors({
 	credentials: true,
 	origin: true
 }));
+
 routes(app);
 // listen for requests
 app.listen(config.port, () => {

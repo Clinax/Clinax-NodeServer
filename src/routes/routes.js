@@ -4,7 +4,9 @@ import {
 } from '../controllers';
 
 export default (app) => {
-    app.get("/auth", UserController.login);
+    app.post("/auth", UserController.login);
+    app.get("/auth/:token", UserController.find);
+    app.delete("/auth/:token", UserController.logout);
 
     // Routes for user
     app.post("/user", UserController.create);

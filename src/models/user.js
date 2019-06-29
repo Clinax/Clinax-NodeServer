@@ -2,9 +2,8 @@ import {
     Schema,
     model
 } from "mongoose";
-import {
-    sha256
-} from "../lib/sha256";
+
+import sha256 from "js-sha256";
 
 var userSchema = Schema({
     avatar: {
@@ -45,14 +44,9 @@ var userSchema = Schema({
     },
     password: {
         type: String,
+        select: false,
         required: [true, "Password is required"],
-        unique: true,
-        set: function (v) {
-            this.password = sha256(v);
-        },
-        get() {
-            return this.password
-        }
+        set: (v) => sha256(v),
     },
 }, {
     timestamps: true
