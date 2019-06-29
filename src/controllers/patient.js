@@ -33,8 +33,10 @@ export function find(req, res) {
 
 export function update(req, res) {
     PatientModel.findById(req.params.patientId, (err, patient) => {
-        if (err)
-            return create404(res, `Failed to retrive patient with id '${req.params.patientId}'`);
+        if (err) return create404(res, `Failed to retrive patient with id '${req.params.patientId}'`, err);
+
+        if (!patient) return create404(res, `Patient with id '${req.params.patientId}' not found`)
+
         for (var attr in req.body.updates)
             patient[attr] = req.body.updates[attr]
 
