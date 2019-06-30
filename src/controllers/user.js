@@ -45,19 +45,23 @@ export function find(req, res) {
     }, (err, tokens) => {
         let token = tokens[0];
         if (token) {
+            const SESSION_VALITY = config.validSessionTTL * 60 * 60;
             let date = new Date();
             let timeElapsed = (date.getTime() - token.timestamp.getTime()) / 100;
 
-            if (timeElapsed <= config.validSessionTTL * 60 * 60)
+            console.log(timeElapsed, SESSION_VALITY.toHHMMSS(), timeElapsed.toHHMMSS());
+
+            if (timeElapsed <= SESSION_VALITY)
                 UserModel.findById(token.userId)
                 .then(user => {
+                    console.log("Sesison about to expire in " + (SESSION_VALITY - timeElapsed).toHHMMSS());
 
                     if (!user) return create404(res, `user with id '${req.params.userId}' not found`);
 
                     user.password = null;
                     res.json(user);
                 })
-            else create400(res, "Session Expired by '" + timeElapsed + "' seconds");
+            else create400(res, "Session Expired by " + timeElapsed.toHHMMSS() + "");
         } else create404(res, "Failed to acces token", err);
     }).catch(err => create500(res, `Failed to retrive user with id '${req.params.userId}'`, err));
 }
