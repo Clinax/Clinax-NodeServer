@@ -4,9 +4,14 @@ import {
 
 export default {
     addressSchema: {
-        streetAddress: String,
-        city: String,
-        State: String,
+        streetAddress: {
+            type: String,
+            trim: true
+        },
+        region: {
+            type: String,
+            trim: true
+        },
         pincode: {
             type: Number,
             validate: (v) => nLength(v) == 6,
@@ -14,6 +19,6 @@ export default {
     },
     bloodGroups: {
         type: String,
-        enum: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-"]
+        enum: ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-", "unknown"]
     }
 }

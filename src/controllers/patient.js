@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 import Utils, {
     create404,
     create500,
@@ -12,7 +14,15 @@ export function create(req, res) {
     if (!req.body.patient)
         return create400(res, "Patient attributes was not provided");
 
-    var patient = new PatientModel(req.body.patient)
+    var patient = req.body.patient,
+        avatar = req.files.avatar;
+    if (avatar) patient = JSON.parse(patient)
+    var patient = new PatientModel(patient)
+
+    let path = `${appRoot}/uploads/img/${patient._id}`;
+    fs.mkdir(path, () => {});
+
+    if (avatar) avatar.mv(`${path}/${avatar.md5}.jpg`)
 
     patient.validate(err => {
         if (!err)

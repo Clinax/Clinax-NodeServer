@@ -15,13 +15,16 @@ import {
 	mongoose
 } from "./config/database.config";
 import config from './config/index.js';
+import fileUpload from 'express-fileupload';
 
 const MongoStore = require('connect-mongo')(session);
 
 const app = express();
+global.appRoot = __dirname;
 
 app.use(logger('dev'));
 
+app.use(fileUpload());
 app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({

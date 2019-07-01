@@ -30,7 +30,7 @@ var patientSchema = Schema({
     gender: {
         type: String,
         lowercase: true,
-        enum: ['m', 'f', 'o']
+        enum: ['male', 'female', 'other']
     },
     phoneNumber: String,
     email: {
@@ -38,17 +38,11 @@ var patientSchema = Schema({
         lowercase: true
     },
     address: MetaSchema.addressSchema,
-    age: {
-        type: Number,
-        min: 0,
-        max: 110,
-    },
     medicalNote: String,
     bloodGroup: MetaSchema.bloodGroups,
     emergencyContact: {
         name: String,
-        phoneNumber: Number,
-        email: String,
+        phoneNumber: String,
         relationShip: String
     },
     cases: [CaseSchema]
