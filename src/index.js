@@ -5,6 +5,9 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
 import requestIp from 'request-ip';
+import compression from 'compression';
+import helmet from 'helmet';
+
 import {
 	urlencoded,
 	json
@@ -24,6 +27,9 @@ const MongoStore = require('connect-mongo')(session);
 
 const app = express();
 global.appRoot = __dirname;
+
+app.use(helmet());
+app.use(compression());
 
 app.use(express.static(appRoot + '/uploads/img/'));
 
