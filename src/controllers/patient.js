@@ -42,7 +42,9 @@ export function find(req, res) {
     PatientModel.findById(req.params.patientId)
         .then(patient => {
             if (!patient) return create404(res, `Patient with id '${req.params.patientId}' not found`)
-            res.json(patient);
+            res.json(patient.toObject({
+                virtuals: true
+            }));
         }).catch(err => create500(res, `Failed to retrive patient with id '${req.params.patientId}'`, err));
 }
 
@@ -61,9 +63,17 @@ export function update(req, res) {
     })
 }
 
-export function findAll(_, response) {
+export function findAll(_, res) {
     PatientModel.find()
-        .then(res => response.json(res))
+        .then(patients => {
+            var temp = [];
+            patients.forEach(patient => {
+                temp.push(patient.toObject({
+                    virtuals: true
+                }));
+            });
+            res.send(temp)
+        })
         .catch(err => create500(res, "Failed to retrive patients details", err));
 }
 

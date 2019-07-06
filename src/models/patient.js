@@ -24,8 +24,7 @@ var patientSchema = Schema({
         },
     },
     dob: {
-        type: Date,
-        alias: "dateOfBirth",
+        type: Date
     },
     gender: {
         type: String,
@@ -68,5 +67,19 @@ patientSchema.virtual('fullName')
             this.name.last = t[2];
         } else this.name.last = t[1];
     });
+
+patientSchema.virtual('age')
+    .get(function () {
+        let dateDif = Date.now() - this.dob.getTime();
+        return new Date(dateDif).getFullYear() - 1970;
+    })
+
+patientSchema.virtual('ageDetailed')
+    .get(function () {
+        let dateDif = new Date(Date.now() - this.dob.getTime());
+        let year = dateDif.getFullYear() - 1970;
+        let month = dateDif.getMonth();
+        return `${year} Years and ${month} months`;
+    })
 
 export const PatientModel = model("Patient", patientSchema);
