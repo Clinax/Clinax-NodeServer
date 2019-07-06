@@ -14,6 +14,7 @@ export default (app) => {
     app.put("/user", UserController.update);
 
     // Routes for patient
+    app.get("/regions/", PatientController.getRegions);
     app.get("/patient/:patientId", PatientController.find);
     app.put("/patient/:patientId", PatientController.update);
     app.delete("/patient/:patientId", PatientController.delete);

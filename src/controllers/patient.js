@@ -77,6 +77,19 @@ export function findAll(_, res) {
         .catch(err => create500(res, "Failed to retrive patients details", err));
 }
 
+export function getRegions(_, res) {
+    PatientModel.find({}, {
+        'address.region': 1,
+        _id: 0
+    }).then(regions => {
+        var temp = [];
+        regions.forEach(region => {
+            temp.push(region.address.region);
+        });
+        res.send(temp)
+    }).catch(err => create500(res, "Failed to retrive regions try again later", err))
+}
+
 const _delete = (req, res) => {
     PatientModel.deleteOne({
             id: req.params.patientId
