@@ -22,6 +22,8 @@ const MongoStore = require('connect-mongo')(session);
 const app = express();
 global.appRoot = __dirname;
 
+app.use(express.static(appRoot + '/uploads/img/'));
+
 app.use(logger('dev'));
 
 app.use(fileUpload());
