@@ -1,6 +1,7 @@
 var m = require('mongoose');
 
-export const url = 'mongodb://localhost:27017/clinic-database';
+// export const url = 'mongodb://localhost:27017/clinic-database';
+export const url = 'mongodb+srv://Raut:ifcsSb7IZmPt9aUG@cluster0-u3wld.mongodb.net/test?retryWrites=true&w=majority';
 
 m.Promise = global.Promise;
 // FIX for: DeprecationWarning: collection.ensureIndex is deprecated. Use createIndexes instead.
