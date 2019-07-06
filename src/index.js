@@ -16,6 +16,9 @@ import {
 } from "./config/database.config";
 import config from './config/index.js';
 import fileUpload from 'express-fileupload';
+// import {
+// 	PatientModel
+// } from './models/patient';
 
 const MongoStore = require('connect-mongo')(session);
 
@@ -47,6 +50,12 @@ app.use(session({
 		maxAge: 2 * 60 * 60 * 100
 	}
 }))
+
+// app.use("/clearAll", (req, res) => {
+// 	PatientModel.deleteMany({}, (err, response) => {
+// 		res.json(response);
+// 	})
+// })
 
 app.use(cors({
 	credentials: true,

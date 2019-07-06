@@ -17,7 +17,9 @@ export function createHTTPResponse(status, res, message, err) {
     var body = {
         message: createMsg(message, err),
     }
-    if (detectDebug() && err) body.error = err
+
+    if (detectDebug() && err)
+        console.error(body.error = err);
 
     return res.status(status).send(body);
 }

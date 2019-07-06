@@ -19,6 +19,7 @@ export default {
     },
     bloodGroups: {
         type: String,
-        enum: ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-", "unknown"]
+        enum: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-", "unknown"],
+        lowercase: true,
     }
 }
