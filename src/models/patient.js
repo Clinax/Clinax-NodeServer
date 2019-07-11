@@ -44,7 +44,11 @@ var patientSchema = Schema({
         phoneNumber: String,
         relationShip: String
     },
-    cases: [CaseSchema]
+    cases: [CaseSchema],
+    doctorId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+    },
 }, {
     timestamps: true
 });
