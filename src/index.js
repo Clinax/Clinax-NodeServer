@@ -63,11 +63,9 @@ app.use(session({
 	}
 }))
 
-// app.use("/clearAll", (req, res) => {
-// 	PatientModel.deleteMany({}, (err, response) => {
-// 		res.json(response);
-// 	})
-// })
+// app.use("/clearAll", (_, res) =>
+// 	PatientModel.deleteMany({}, (_, response) => res.json(response))
+// )
 
 app.use(cors({
 	credentials: true,

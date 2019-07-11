@@ -1,7 +1,5 @@
 function createMsg(message, err) {
-    let msg = message || "Some error occurred. Try again in some time";
-
-    if (false && detectDebug() && err) msg += `=> Error message: ${err.message}`
+    let msg = message || (err && err.message) || "Some error occurred. Try again in some time";
     return msg
 }
 
