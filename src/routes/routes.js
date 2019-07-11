@@ -14,12 +14,12 @@ export default (app) => {
     app.put("/user", UserController.update);
 
     // Routes for patient
-    app.get("/regions/", PatientController.getRegions);
-    app.get("/patient/:patientId", PatientController.find);
+    app.get("/:token/regions/", PatientController.getRegions);
+    app.get("/:token/patient/:patientId", PatientController.find);
     app.put("/patient/:patientId", PatientController.update);
     app.delete("/patient/:patientId", PatientController.delete);
 
-    app.get("/patient", PatientController.findAll);
+    app.get("/:token/patient", PatientController.findAll);
     app.post("/patient", PatientController.create);
 
     // Misc routes

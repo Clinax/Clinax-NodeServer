@@ -22,6 +22,12 @@ import fileUpload from 'express-fileupload';
 // import {
 // 	PatientModel
 // } from './models/patient';
+import {
+	verifyToken
+} from './controllers/user';
+import {
+	create400
+} from './utils';
 
 const MongoStore = require('connect-mongo')(session);
 
@@ -67,6 +73,14 @@ app.use(cors({
 	credentials: true,
 	origin: true
 }));
+
+app.use('*', (req, res, next) => {
+	if (req.params[0].indexOf('auth') == -1) {
+		let match = /\/([a-zA-Z0-9]+)\//gm.exec(req.params[0]);
+		let token = (match && match[1]) || req.body.token;
+		verifyToken(token, _ => next(), err => create400(res, null, err))
+	} else next();
+})
 
 routes(app);
 // listen for requests
