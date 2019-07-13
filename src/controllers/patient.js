@@ -27,7 +27,7 @@ export function create(req, res) {
     if (!err)
       patient
         .save()
-        .then(data => res.json(data))
+        .then(patient => res.json(patient))
         .catch(err => create500(res, err.message));
     else create400(res, err.message);
   });
@@ -41,11 +41,7 @@ export function find(req, res) {
           res,
           `Patient with id '${req.params.patientId}' not found`
         );
-      res.json(
-        patient.toObject({
-          virtuals: true
-        })
-      );
+      res.json(patient.toObject());
     })
     .catch(err =>
       create500(
@@ -87,7 +83,7 @@ export function update(req, res) {
 
     patient
       .save()
-      .then(patient => res.json(patient))
+      .then(patient => res.json(patient.toObject()))
       .catch(err =>
         create400(
           res,
@@ -103,11 +99,7 @@ export function findAll(_, res) {
     .then(patients => {
       var temp = [];
       patients.forEach(patient => {
-        temp.push(
-          patient.toObject({
-            virtuals: true
-          })
-        );
+        temp.push(patient.toObject());
       });
       res.send(temp);
     })
@@ -115,13 +107,7 @@ export function findAll(_, res) {
 }
 
 export function getRegions(_, res) {
-  PatientModel.find(
-    {},
-    {
-      "address.region": 1,
-      _id: 0
-    }
-  )
+  PatientModel.find({}, { "address.region": 1 })
     .then(regions => {
       var temp = [];
       regions.forEach(region => {
@@ -135,9 +121,7 @@ export function getRegions(_, res) {
 }
 
 const _delete = (req, res) => {
-  PatientModel.deleteOne({
-    id: req.params.patientId
-  })
+  PatientModel.deleteOne({ id: req.params.patientId })
     .then(n => res.send(n))
     .catch(err =>
       create400(

@@ -52,6 +52,10 @@ var userSchema = Schema(
   }
 );
 
+userSchema.virtual("intials").get(function() {
+  return this.name.first[0] + (this.name.last[0] || "");
+});
+
 userSchema
   .virtual("fullName")
   .get(function() {
@@ -72,5 +76,7 @@ userSchema
       this.name.last = t[2];
     } else this.name.last = t[1];
   });
+
+userSchema.set("toObject", { virtuals: true });
 
 export const UserModel = model("User", userSchema);

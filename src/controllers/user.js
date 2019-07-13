@@ -65,8 +65,7 @@ export function find(req, res) {
             res,
             `user with id '${req.params.userId}' not found`
           );
-        user.password = null;
-        res.json(user);
+        res.json(user.toObject());
       }),
     err => {
       if (err instanceof TokenExpiredError) create400(res, null, err);

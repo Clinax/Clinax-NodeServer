@@ -57,6 +57,10 @@ patientSchema.index({
   "$**": "text"
 });
 
+patientSchema.virtual("intials").get(function() {
+  return this.name.first[0] + (this.name.last[0] || "");
+});
+
 patientSchema
   .virtual("fullName")
   .get(function() {
@@ -89,5 +93,7 @@ patientSchema.virtual("ageDetailed").get(function() {
   let month = dateDif.getMonth();
   return `${year} Years and ${month} months`;
 });
+
+patientSchema.set("toObject", { virtuals: true });
 
 export const PatientModel = model("Patient", patientSchema);
