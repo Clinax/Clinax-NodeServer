@@ -17,13 +17,12 @@ import fileUpload from "express-fileupload";
 // import {
 // 	PatientModel
 // } from './models/patient';
-import { verifyToken } from "./controllers/user";
-import { create400 } from "./utils";
+global.appRoot = __dirname;
+global.publicKey = "tgLWEYL8r8H*X6Xen&=W";
 
 const MongoStore = require("connect-mongo")(session);
 
 const app = express();
-global.appRoot = __dirname;
 
 app.use(helmet());
 app.use(compression());
@@ -62,15 +61,6 @@ app.use(
     origin: true
   })
 );
-
-app.use("*", (req, res, next) => {
-  if (req.params[0].indexOf("auth") == -1) {
-    let match = req.params[0].match(/^\/([a-zA-Z0-9]+)\/.*/);
-    let token = req.body.token || (match && match[1]);
-
-    verifyToken(token, _ => next(), err => create400(res, null, err));
-  } else next();
-});
 
 routes(app);
 // listen for requests
