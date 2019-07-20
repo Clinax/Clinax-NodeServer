@@ -10,11 +10,6 @@ const ulhSchema = Schema({
     required: true,
     default: "No IP found"
   },
-  token: {
-    type: String,
-    required: true,
-    index: true
-  },
   timestamp: {
     type: Date,
     default: Date.now

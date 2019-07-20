@@ -83,7 +83,7 @@ export function update(req, res) {
 
     patient
       .save()
-      .then(patient => res.json(patient.toObject()))
+      .then(patienta => res.json(patienta.toObject()))
       .catch(err =>
         create400(
           res,
@@ -94,8 +94,8 @@ export function update(req, res) {
   });
 }
 
-export function findAll(_, res) {
-  PatientModel.find()
+export function findAll(req, res) {
+  PatientModel.find({ doctorId: req.user._id })
     .then(patients => {
       var temp = [];
       patients.forEach(patient => {

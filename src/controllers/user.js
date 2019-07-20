@@ -1,33 +1,10 @@
 import { UserModel } from "../models/user";
 import { create404, create500, create400 } from "../utils";
 
-import { sha224, sha256 } from "js-sha256";
+import { sha256 } from "js-sha256";
 import { ULHModel } from "../models/userLoginHistory";
-import config from "../config";
-
-class TokenExpiredError extends Error {}
-
-export function verifyToken(token, callback, err) {
-  ULHModel.findOne(
-    {
-      token: token
-    },
-    (error, token) => {
-      if (token) {
-        const SESSION_VALITY = config.validSessionTTL * 60 * 60;
-        let date = new Date();
-        let timeElapsed = (date.getTime() - token.timestamp.getTime()) / 100;
-        console.log(
-          "Sesison about to expire in " +
-            (SESSION_VALITY - timeElapsed).toHHMMSS()
-        );
-
-        if (timeElapsed <= SESSION_VALITY) callback(token);
-        else err(new TokenExpiredError("Token expired"));
-      } else err(error);
-    }
-  ).catch(err);
-}
+import jwt from "jsonwebtoken";
+import { createPrivateKey } from "crypto";
 
 export function create(req, res) {
   if (!req.body.user) return create400(res, "user attributes was not provided");
@@ -55,29 +32,7 @@ export function create(req, res) {
   });
 }
 
-export function find(req, res) {
-  verifyToken(
-    req.params.token,
-    token =>
-      UserModel.findById(token.userId).then(user => {
-        if (!user)
-          return create404(
-            res,
-            `user with id '${req.params.userId}' not found`
-          );
-        res.json(user.toObject());
-      }),
-    err => {
-      if (err instanceof TokenExpiredError) create400(res, null, err);
-      else
-        create500(
-          res,
-          `Failed to retrive user with id '${req.params.userId}'`,
-          err
-        );
-    }
-  );
-}
+export const find = (req, res) => res.json(req.user.toObject());
 
 // export function findAll(_, response) {
 //     UserModel.find()
@@ -86,26 +41,18 @@ export function find(req, res) {
 // }
 
 export function update(req, res) {
-  UserModel.findById(req.params.userId, (err, user) => {
-    if (err)
-      return create404(
+  for (var attr in req.body.updates) req.user[attr] = req.body.updates[attr];
+
+  req.user
+    .save()
+    .then(user => res.json(user))
+    .catch(err =>
+      create400(
         res,
-        `Failed to retrive user with id '${req.params.userId}'`
-      );
-
-    for (var attr in req.body.updates) user[attr] = req.body.updates[attr];
-
-    user
-      .save()
-      .then(user => res.json(user))
-      .catch(err =>
-        create400(
-          res,
-          `Failed to update user with id '${req.params.userId}'`,
-          err
-        )
-      );
-  });
+        `Failed to update user with id '${req.params.userId}'`,
+        err
+      )
+    );
 }
 
 export function logout(req, res) {
@@ -140,44 +87,35 @@ export function login(req, res) {
   if (!req.body.username || !req.body.password)
     return create400(res, "Missing username or password");
 
-  UserModel.find(
-    {
-      username: req.body.username
-    },
-    (err, users) => {
-      let user = users[0];
+  UserModel.findOne({ username: req.body.username }, (err, user) => {
+    if (err || !user)
+      return create404(
+        res,
+        `User with username '${req.body.username}' not found`
+      );
 
-      if (err || !user)
-        return create404(
-          res,
-          `User with username '${req.body.username}' not found`
-        );
+    if (user.password == sha256(req.body.password)) {
+      var date = new Date();
 
-      if (user.password == sha256(req.body.password)) {
-        var date = new Date();
+      new ULHModel({
+        userId: user._id,
+        userIp: req.clientIp,
+        timestamp: date
+      }).save();
 
-        let ulh = new ULHModel({
-          userId: user._id,
-          userIp: req.clientIp,
-          token: sha224(user.password + user.username + date.toString()),
-          timestamp: date
-        });
+      let token = jwt.sign({ id: user._id }, publicKey, {
+        expiresIn: "15 day"
+      });
 
-        ulh.save().then(token => {
-          req.session.token = token;
-          if (token)
-            res.json({
-              token: token.token,
-              user
-            });
-          else create500(res, "Something went wrong");
-        });
-      } else
-        res.json({
-          message: "Password is incorrect"
-        });
-    }
-  ).select("+password");
+      let _user = user.toObject();
+      delete _user.password;
+
+      res.json({
+        token: token,
+        user: _user
+      });
+    } else res.json({ message: "Password is incorrect" });
+  }).select("+password");
 }
 
 const _delete = (req, res) => {

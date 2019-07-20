@@ -35,6 +35,8 @@ var patientSchema = Schema(
       lowercase: true
     },
     address: MetaSchema.addressSchema,
+    familyHistory: String,
+    pastHistory: String,
     medicalNote: String,
     bloodGroup: MetaSchema.bloodGroups,
     emergencyContact: {
@@ -42,7 +44,7 @@ var patientSchema = Schema(
       phoneNumber: String,
       relationShip: String
     },
-    caseId: Schema.Types.ObjectId,
+    case: CaseSchema,
     doctorId: {
       type: Schema.Types.ObjectId,
       required: true
