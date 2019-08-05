@@ -27,7 +27,6 @@ export default app => {
   app.put("/user", verify, UserController.update);
 
   // Routes for patient
-  app.get("/regions/", verify, PatientController.getRegions);
   app.get("/patient/:patientId", verify, PatientController.find);
   app.put("/patient/:patientId", verify, PatientController.update);
   app.delete("/patient/:patientId", verify, PatientController.delete);
@@ -36,5 +35,7 @@ export default app => {
   app.post("/patient", verify, PatientController.create);
 
   // Misc routes
+  app.get("/regions/", verify, PatientController.getRegions);
+  app.get("/drugs/", verify, PatientController.getDrugs);
   app.get("/search/:keyword", verify, Controller.search);
 };

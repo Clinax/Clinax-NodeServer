@@ -12,6 +12,7 @@ const CaseSchema = Schema(
       trim: true,
       required: true
     },
+    crietria: [{ name: String, value: String }],
     physiqueGeneral: {
       type: String,
       trim: true
@@ -20,49 +21,20 @@ const CaseSchema = Schema(
       type: String
     },
     onExamination: {
-      eyes: {
-        type: String,
-        trim: true
+      type: [{ name: String, value: String }],
+      get(cc) {
+        if (!cc) return [];
+        let t = {};
+        cc.forEach(a => {
+          t[a.name] = a.value;
+        });
+
+        return t;
       },
-      throat: {
-        type: String,
-        trim: true
-      },
-      nose: {
-        type: String,
-        trim: true
-      },
-      chest: {
-        type: String,
-        trim: true
-      },
-      perAbdomin: {
-        type: String,
-        trim: true
-      },
-      BP: {
-        type: String,
-        trim: true
-      },
-      weight: {
-        type: String,
-        trim: true
-      },
-      pulse: {
-        type: String,
-        trim: true
-      },
-      cvs: {
-        type: String,
-        trim: true
-      },
-      cns: {
-        type: String,
-        trim: true
-      },
-      skin: {
-        type: String,
-        trim: true
+      set(v) {
+        let t = [];
+        for (const key in v) t.push({ name: key, value: v[key] });
+        return t;
       }
     },
     duringAcute: {
@@ -73,17 +45,23 @@ const CaseSchema = Schema(
       type: String,
       trim: true
     },
-    treatment: {
-      medicine: {
-        drug: {
-          type: String,
-          trim: true
-        },
-        potency: {
-          type: String,
-          trim: true
-        }
+    extra: {
+      type: { name: String, value: String },
+      get(cc) {
+        if (!cc) return [];
+
+        let t = {};
+        cc.forEach(a => (t[a.name] = a.value));
+        return t;
       },
+      set(v) {
+        let t = [];
+        for (const key in v) t.push({ name: key, value: v[key] });
+        return t;
+      }
+    },
+    treatment: {
+      drugs: [String],
       otherDetails: String
     },
     followUps: [FollowUp]
@@ -92,5 +70,7 @@ const CaseSchema = Schema(
     timestamps: true
   }
 );
+
+CaseSchema.set("toObject", { getters: true });
 
 export default CaseSchema;
