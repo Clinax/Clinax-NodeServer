@@ -45,7 +45,9 @@ app.use(
 );
 
 routes(app);
-
+app.use((req, res) => {
+  res.send();
+});
 // listen for requests
 app.listen(process.env.PORT, () => {
   console.log("Server is listening on port " + process.env.PORT);

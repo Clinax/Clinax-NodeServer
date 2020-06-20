@@ -6,6 +6,7 @@ import { getExtension } from "../modules/file";
 import { stringToRegex } from "../modules/regex";
 import CaseModel from "../models/CaseModel";
 import { getDistinct } from "../modules/list";
+import { compressToUTF16 } from "lz-string";
 
 export function create(req, res) {
   if (!req.files) req.files = {};
@@ -73,7 +74,7 @@ export function search(req, res) {
   if (!regex) return res.json([]);
 
   regex = { $regex: regex };
-  PatientModel.find({
+  let query = PatientModel.find({
     $or: [
       { "name.first": regex },
       { "name.middle": regex },
@@ -84,13 +85,25 @@ export function search(req, res) {
       { "address.area": regex },
       { "case.followUps.chiefComplain": regex },
     ],
-  })
-    .populate({
+  });
+
+  if (req.queryParams.minimal == "true")
+    query.select("name email case.followUps.chiefComplain");
+  else
+    query.populate({
       path: "case",
       select: "followUps",
       populate: { path: "followUps", select: "chiefComplain" },
-    })
-    .then((patients) => res.json(patients.map((ev) => ev.toObject())))
+    });
+
+  query
+    .then((patients) =>
+      res.json({
+        compressedData: compressToUTF16(
+          JSON.stringify(patients.map((ev) => ev.toObject()))
+        ),
+      })
+    )
     .catch((err) => create500(res, err));
 }
 

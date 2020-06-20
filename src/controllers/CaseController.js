@@ -1,9 +1,7 @@
 import CaseModel from "../models/CaseModel";
-import PatientModel from "../models/PatientModel";
 import FollowUpModel from "../models/FollowUpModel";
 import { create500, create400 } from "../modules/httpErrors";
 import moment from "moment";
-import { getPatientColor } from "../utils";
 
 export function create(req, res) {
   let _case = new CaseModel(req.body);
@@ -63,49 +61,4 @@ function validateAndSave(res, _case) {
       .then((_case) => res.json(_case.toObject()))
       .catch((err) => create500(res, err));
   });
-}
-
-export function getFollowUpsMinimal(req, res) {
-  PatientModel.find({
-    addedBy: req.user._id,
-  })
-    .populate({
-      path: "case",
-      populate: { path: "followUps", select: "nextFollowUpDate" },
-      select: "followUps",
-    })
-    .select("case name")
-    .then((patients) => {
-      let data = {};
-
-      patients.forEach((patient) => {
-        patient = patient.toObject();
-        patient.case &&
-          patient.case.followUps.forEach((ev) => {
-            if (!ev.nextFollowUpDate) return;
-
-            let name = patient.fullname;
-            let color = getPatientColor(patient._id);
-            let date = moment(ev.nextFollowUpDate);
-
-            if (!data[date.format("YYYY-MM-DD")])
-              data[date.format("YYYY-MM-DD")] = [];
-
-            data[date.format("YYYY-MM-DD")].push({
-              _id: patient._id,
-              followUpId: ev._id,
-              date: date.format("YYYY-MM-DD"),
-              start: date.format("YYYY-MM-DD hh:mm"),
-              end: date.endOf("day").format("YYYY-MM-DD hh:mm"),
-              name,
-              color,
-            });
-          });
-      });
-
-      res.json(data);
-    })
-    .catch((err) => {
-      create500(res, err);
-    });
 }

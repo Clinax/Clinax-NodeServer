@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import { authenticate } from "../controllers/AuthController";
-import { getFollowUpsMinimal } from "../controllers/CaseController";
 import { search } from "../controllers/PatientController";
 import * as UserController from "../controllers/UserController";
 
@@ -12,5 +11,12 @@ router.put("/user", authenticate, UserController.update);
 
 router.get("/search/:key", authenticate, search);
 
-router.get("/followUp/events", authenticate, getFollowUpsMinimal);
+router.get(
+  "/followUp/events",
+  authenticate,
+  UserController.getFollowUpsMinimal
+);
+
+router.post("/appointment", authenticate, UserController.addAppointment);
+
 export default router;
