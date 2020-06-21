@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { SchemaTypes } from "../utils";
+import moment from "moment";
 
 const appointmentSchema = new Schema(
   {
@@ -12,6 +13,10 @@ const appointmentSchema = new Schema(
   },
   { timestamps: true }
 );
+
+appointmentSchema.virtual("patientName").get(function () {
+  return (this.patient && this.patient.fullname) || this.name;
+});
 
 appointmentSchema.set("toObject", { getters: true });
 

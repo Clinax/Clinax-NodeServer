@@ -18,5 +18,6 @@ router.get(
 );
 
 router.post("/appointment", authenticate, UserController.addAppointment);
+router.get("/appointments", authenticate, UserController.getAppointments);
 
 export default router;

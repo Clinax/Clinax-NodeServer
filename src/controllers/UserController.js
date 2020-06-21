@@ -61,7 +61,18 @@ export function addAppointment(req, res) {
     .then(() => res.send("ok"))
     .catch((err) => create500(res, err));
 }
-
+export function getAppointments(req, res) {
+  AppointmentModel.find({
+    user: req.user._id,
+    dateTime: {
+      $gte: moment(req.queryParams.from).startOf("day").toDate(),
+      $lte: moment(req.queryParams.to).endOf("day").toDate(),
+    },
+  })
+    .populate({ path: "patient", select: "name" })
+    .then((entries) => res.json(entries.map((ev) => ev.toObject())))
+    .catch((err) => create500(res, err));
+}
 export async function getFollowUpsMinimal(req, res) {
   let patients = await PatientModel.find({ addedBy: req.user._id })
     .populate({
