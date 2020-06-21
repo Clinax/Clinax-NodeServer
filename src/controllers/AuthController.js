@@ -51,7 +51,8 @@ export function login(req, res) {
 }
 
 export function authenticate(req, res, next) {
-  let token = req.headers.authorization.split(" ")[1];
+  let token =
+    req.headers.authorization && req.headers.authorization.split(" ")[1];
 
   if (!token) return create499(res, "Missing Token");
 

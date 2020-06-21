@@ -17,6 +17,7 @@ import routes from "./routes";
 
 import "./init";
 import queryPaser from "./modules/queryPaser";
+import { create404 } from "./modules/httpErrors";
 
 global.APP_ROOT = __dirname;
 
@@ -45,9 +46,11 @@ app.use(
 );
 
 routes(app);
-app.use((req, res) => {
-  res.send();
+
+app.use("*", (_, res) => {
+  create404(res, "Page not found");
 });
+
 // listen for requests
 app.listen(process.env.PORT, () => {
   console.log("Server is listening on port " + process.env.PORT);
