@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "start cmd /k nodemon app/index.js && nodemon src --exec babel --presets es2015 -w src/ --out-dir app/",
     "build": "babel src --out-dir dist",
-    "start": "npm run build & set NODE_ENV=production node dist/index.js",
+    "start": "set NODE_ENV=production & node dist/index.js",
     "serve": "nodemon --exec babel-node src/index.js"
   },
   "keywords": [
