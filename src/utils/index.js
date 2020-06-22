@@ -1,6 +1,6 @@
 import stc from "string-to-color";
 
-export const detectDebug = () => process.env.NODE_ENV !== "production";
+export const isProduction = () => process.env.NODE_ENV === "production";
 
 export const SchemaTypes = {
   trimmedString: { type: String, trim: true },

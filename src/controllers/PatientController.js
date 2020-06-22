@@ -116,7 +116,10 @@ export function getAreas(req, res) {
       let areas = getDistinct(
         patients.map((ev) => ev.address && ev.address.area)
       ).filter((ev) => !!ev);
-      res.send(areas);
+      let pins = getDistinct(
+        patients.map((ev) => ev.address && ev.address.pincode)
+      ).filter((ev) => !!ev);
+      res.send({ pins, areas });
     })
     .catch((err) => create500(res, "Failed to retrive areas", err));
 }

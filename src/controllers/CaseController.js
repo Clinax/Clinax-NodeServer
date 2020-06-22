@@ -2,6 +2,7 @@ import CaseModel from "../models/CaseModel";
 import FollowUpModel from "../models/FollowUpModel";
 import { create500, create400 } from "../modules/httpErrors";
 import moment from "moment";
+import PatientModel from "../models/PatientModel";
 
 export function create(req, res) {
   let _case = new CaseModel(req.body);
@@ -19,6 +20,10 @@ export function update(req, res) {
   let updates = req.body;
 
   for (var attr in updates) _case[attr] = updates[attr];
+
+  PatientModel.findByIdAndUpdate(req.patient._id, {
+    updatedAt: new Date(),
+  });
 
   validateAndSave(res, _case);
 }
@@ -41,6 +46,11 @@ export async function createFollowUp(req, res) {
   await _case.save();
 
   await followUp.save();
+
+  await PatientModel.findByIdAndUpdate(req.queryParams.patientId, {
+    updatedAt: new Date(),
+  });
+
   res.json(followUp.toObject());
 }
 
@@ -48,7 +58,12 @@ export function updateFollowUp(req, res) {
   FollowUpModel.findByIdAndUpdate(req.params.followUpId, req.body, {
     new: true,
   })
-    .then((followUp) => res.send(followUp.toObject()))
+    .then(async (followUp) => {
+      await PatientModel.findByIdAndUpdate(req.queryParams.patientId, {
+        updatedAt: new Date(),
+      });
+      res.send(followUp.toObject());
+    })
     .catch((err) => create500(res, err, "Failed to update followup"));
 }
 

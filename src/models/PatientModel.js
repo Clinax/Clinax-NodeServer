@@ -1,11 +1,19 @@
-import CaseSchema from "./CaseModel";
-
 import { model, Schema } from "mongoose";
 import { addressSchema, bloodGroup, gender } from "./metas";
+
 import fullNameVirtual from "../modules/fullNameVirtual";
+import autoNumberPlugin from "@safer-bwd/mongoose-autonumber";
 
 var patientSchema = new Schema(
   {
+    pid: {
+      type: String,
+      immutable: true,
+      autonumber: true,
+      autonumber: {
+        prefix: () => "PID-",
+      },
+    },
     avatar: { type: String, trim: true },
     name: {
       first: {
@@ -14,17 +22,11 @@ var patientSchema = new Schema(
         required: [true, "Name is required"],
       },
       middle: String,
-      last: {
-        type: String,
-        select: true,
-      },
+      last: { type: String, select: true },
     },
     address: addressSchema,
     phone: String,
-    email: {
-      type: String,
-      lowercase: true,
-    },
+    email: { type: String, lowercase: true },
     birthDate: Date,
     gender,
     bloodGroup,
@@ -43,8 +45,10 @@ var patientSchema = new Schema(
       required: true,
       ref: "doctor",
     },
+    createdAt: { type: Date, immutable: true, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  { timestamps: false }
 );
 
 patientSchema.virtual("case", {
@@ -54,8 +58,13 @@ patientSchema.virtual("case", {
   justOne: true,
 });
 
-// patientSchema.index({ "$**": "text" });
+patientSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  return next();
+});
 
+// patientSchema.index({ "$**": "text" });
+patientSchema.plugin(autoNumberPlugin);
 fullNameVirtual(patientSchema);
 
 patientSchema.virtual("age").get(function () {
