@@ -15,6 +15,7 @@ var patientSchema = new Schema(
       },
     },
     avatar: { type: String, trim: true },
+    prefix: String,
     name: {
       first: {
         type: String,
@@ -23,6 +24,10 @@ var patientSchema = new Schema(
       },
       middle: String,
       last: { type: String, select: true },
+    },
+    maritalStatus: {
+      type: String,
+      enum: ["Single", "Married", "Divorced", "Widowed", "Separated"],
     },
     address: addressSchema,
     phone: String,
