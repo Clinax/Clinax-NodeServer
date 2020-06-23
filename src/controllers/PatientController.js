@@ -84,7 +84,8 @@ export function getAll(req, res) {
             ev.diagnoses = {};
             temp.forEach((e) => {
               let a = ev.diagnoses[e.diagnosis];
-              ev.diagnoses[e.diagnosis] = a > e.createdAt ? a : e.createdAt;
+              ev.diagnoses[e.diagnosis] =
+                a && a < e.createdAt ? a : e.createdAt;
             });
           }
 
