@@ -46,6 +46,7 @@
     "jsonwebtoken": "^8.5.1",
     "lz-string": "^1.4.4",
     "moment": "^2.27.0",
+    "moment-timezone": "^0.5.31",
     "mongoose": "^5.9.19",
     "morgan": "^1.10.0",
     "regenerator-runtime": "^0.13.5",

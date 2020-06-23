@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import UserModel from "../models/UserModel";
 import AppointmentModel from "../models/AppointmentModel";
 import PatientModel from "../models/PatientModel";
@@ -61,6 +61,7 @@ export function addAppointment(req, res) {
     .then(() => res.send("ok"))
     .catch((err) => create500(res, err));
 }
+
 export function getAppointments(req, res) {
   AppointmentModel.find({
     user: req.user._id,
@@ -73,6 +74,7 @@ export function getAppointments(req, res) {
     .then((entries) => res.json(entries.map((ev) => ev.toObject())))
     .catch((err) => create500(res, err));
 }
+
 export async function getFollowUpsMinimal(req, res) {
   let patients = await PatientModel.find({ addedBy: req.user._id })
     .populate({
@@ -92,7 +94,7 @@ export async function getFollowUpsMinimal(req, res) {
 
         let name = patient.fullname;
         let color = getPatientColor(patient._id);
-        let date = moment(ev.nextFollowUpDate);
+        let date = moment(ev.nextFollowUpDate).tz(req.headers.timezone);
 
         let key = date.format("YYYY-MM-DD");
 
@@ -116,7 +118,7 @@ export async function getFollowUpsMinimal(req, res) {
   }).populate({ path: "patient", select: "name" });
 
   appointments.forEach((appointment) => {
-    let date = moment(appointment.dateTime);
+    let date = moment(appointment.dateTime).tz(req.headers.timezone);
     let key = date.format("YYYY-MM-DD");
 
     if (!data[key]) data[key] = [];
