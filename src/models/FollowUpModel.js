@@ -8,10 +8,10 @@ const followUpSchema = new Schema(
     chiefComplain: SchemaTypes.trimmedString,
     femaleComplain: SchemaTypes.trimmedString,
 
-    criteria: {},
-    physicalGeneral: {},
-    onExamination: {},
-    extra: {},
+    criteria: { type: {}, default: {} },
+    physicalGeneral: { type: {}, default: {} },
+    onExamination: { type: {}, default: {} },
+    extra: { type: {}, default: {} },
 
     treatment: {
       type: new Schema({
