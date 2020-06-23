@@ -14,16 +14,19 @@ const followUpSchema = new Schema(
     extra: {},
 
     treatment: {
-      drugs: [
-        {
-          name: SchemaTypes.trimmedString,
-          potency: SchemaTypes.trimmedString,
-          dosage: SchemaTypes.trimmedString,
-          duration: Number,
-        },
-      ],
-      parallelTreatment: SchemaTypes.trimmedString,
-      diagnosis: SchemaTypes.trimmedString,
+      type: new Schema({
+        drugs: [
+          {
+            name: SchemaTypes.trimmedString,
+            potency: SchemaTypes.trimmedString,
+            dosage: SchemaTypes.trimmedString,
+            duration: Number,
+          },
+        ],
+        parallelTreatment: SchemaTypes.trimmedString,
+        diagnosis: SchemaTypes.trimmedString,
+      }),
+      default: { drugs: [] },
     },
     nextFollowUpDate: Date,
   },

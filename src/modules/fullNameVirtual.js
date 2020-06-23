@@ -11,6 +11,8 @@ export default function (schema) {
       if (!this.name) return;
 
       return (
+        (this.prefix || "") +
+        " " +
         this.name.first +
         " " +
         (this.name.middle || "") +

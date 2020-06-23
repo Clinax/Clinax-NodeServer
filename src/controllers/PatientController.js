@@ -1,10 +1,12 @@
 import fs from "fs";
 
 import PatientModel from "../models/PatientModel";
+import CaseModel from "../models/CaseModel";
+import FollowUpModel from "../models/FollowUpModel";
+
 import { create404, create500, create400 } from "../modules/httpErrors";
 import { getExtension } from "../modules/file";
 import { stringToRegex } from "../modules/regex";
-import CaseModel from "../models/CaseModel";
 import { getDistinct } from "../modules/list";
 import { compressToUTF16 } from "lz-string";
 
@@ -57,7 +59,40 @@ export function update(req, res) {
 
 export function getAll(req, res) {
   PatientModel.find({ addedBy: req.user._id })
-    .then((patients) => res.send(patients.map((ev) => ev.toObject())))
+    .populate({
+      path: "case",
+      populate: { path: "followUps", select: "treatment.diagnosis createdAt" },
+      select: "followUps",
+    })
+    .then((patients) =>
+      res.send(
+        patients.map((ev) => {
+          ev = ev.toObject();
+          let temp = ev.case.followUps
+            .map(
+              (ev) =>
+                ev.treatment && {
+                  diagnosis: ev.treatment.diagnosis,
+                  createdAt: ev.createdAt,
+                }
+            )
+            .filter((ev) => !!ev);
+
+          if (temp && temp.length) {
+            ev.diagnosis = temp[temp.length - 1].diagnosis;
+            ev.diagnosedAt = temp[temp.length - 1].createdAt;
+            ev.diagnoses = {};
+            temp.forEach((e) => {
+              let a = ev.diagnoses[e.diagnosis];
+              ev.diagnoses[e.diagnosis] = a > e.createdAt ? a : e.createdAt;
+            });
+          }
+
+          ev.case = ev.case._id;
+          return ev;
+        })
+      )
+    )
     .catch((err) => create500(res, "Failed to retrive patients details", err));
 }
 
@@ -68,32 +103,47 @@ function _delete(req, res) {
 }
 export { _delete as delete };
 
-export function search(req, res) {
-  let regex = stringToRegex(req.params.key);
+export async function search(req, res) {
+  let regex = stringToRegex(req.queryParams.search);
 
   if (!regex) return res.json([]);
 
   regex = { $regex: regex };
-  let query = PatientModel.find({
-    $or: [
-      { "name.first": regex },
-      { "name.middle": regex },
-      { "name.last": regex },
-      { email: regex },
-      { phone: regex },
-      { "address.street": regex },
-      { "address.area": regex },
-      { "case.followUps.chiefComplain": regex },
-    ],
-  });
 
-  if (req.queryParams.minimal == "true")
-    query.select("name email case.followUps.chiefComplain");
+  let queries = [
+    { "name.first": regex },
+    { "name.middle": regex },
+    { "name.last": regex },
+    { email: regex },
+    { phone: regex },
+    { "address.street": regex },
+    { "address.area": regex },
+  ];
+
+  if (req.queryParams.minimal != "true") {
+    let follows = await FollowUpModel.find({
+      $or: [{ chiefComplain: regex }, { "treatment.diagnosis": regex }],
+    }).select("_id");
+    let cases = await CaseModel.find({
+      followUps: { $in: follows.map((ev) => ev._id) },
+    }).select("patient");
+
+    queries.push({
+      _id: { $in: cases.map((ev) => ev.patient) },
+    });
+  }
+
+  let query = PatientModel.find({ $or: queries });
+
+  if (req.queryParams.minimal == "true") query.select("name email");
   else
     query.populate({
       path: "case",
       select: "followUps",
-      populate: { path: "followUps", select: "chiefComplain" },
+      populate: {
+        path: "followUps",
+        select: "chiefComplain treatment.diagnosis",
+      },
     });
 
   query

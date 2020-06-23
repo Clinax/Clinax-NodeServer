@@ -9,7 +9,7 @@ const router = Router();
 router.post("/user", UserController.create);
 router.put("/user", authenticate, UserController.update);
 
-router.get("/search/:key", authenticate, search);
+router.get("/search", authenticate, search);
 
 router.get(
   "/followUp/events",
