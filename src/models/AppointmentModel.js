@@ -5,7 +5,7 @@ import moment from "moment";
 const appointmentSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "user", required: true },
-    patient: { type: Schema.Types.ObjectId, ref: "patient" },
+    patient: { type: Schema.Types.ObjectId, ref: "patient", immutable: false },
     name: SchemaTypes.trimmedString,
     contact: SchemaTypes.trimmedString,
     notes: SchemaTypes.trimmedString,

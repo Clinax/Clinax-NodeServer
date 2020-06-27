@@ -7,6 +7,8 @@ router.get("/patient", authenticate, PatientController.getAll);
 router.post("/patient", authenticate, PatientController.create);
 router.get("/patient/areas", authenticate, PatientController.getAreas);
 
+router.get("/search", authenticate, PatientController.search);
+
 router.get(
   "/patient/:patientId",
   authenticate,
