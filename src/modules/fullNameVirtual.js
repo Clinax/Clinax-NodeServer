@@ -5,14 +5,28 @@ export default function (schema) {
       this.name.first[0] + ((this.name.last && this.name.last[0]) || "")
     );
   });
+  schema.virtual("prefixFullname").get(function () {
+    if (!this.name) return;
+
+    return (
+      (this.prefix || "") +
+      " " +
+      this.name.first +
+      " " +
+      (this.name.middle || "") +
+      " " +
+      (this.name.last || "")
+    )
+      .replace("  ", " ")
+      .trim();
+  });
+
   schema
     .virtual("fullname")
     .get(function () {
       if (!this.name) return;
 
       return (
-        (this.prefix || "") +
-        " " +
         this.name.first +
         " " +
         (this.name.middle || "") +
@@ -29,6 +43,9 @@ export default function (schema) {
       if (t[2]) {
         this.name.middle = t[1];
         this.name.last = t[2];
-      } else this.name.last = t[1];
+      } else {
+        this.name.last = t[1];
+        this.name.middle = "";
+      }
     });
 }

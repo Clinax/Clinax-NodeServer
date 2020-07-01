@@ -78,16 +78,17 @@ export async function getFollowUpsMinimal(req, res) {
 
         if (!data[key]) data[key] = [];
 
-        data[key].push({
-          _id: patient._id,
-          followUpId: ev._id,
-          date: key,
-          type: "follow-up",
-          start: date.format("YYYY-MM-DD hh:mm"),
-          end: date.endOf("day").format("YYYY-MM-DD hh:mm"),
-          name,
-          color,
-        });
+        if (!data[key].find((e) => patient._id == e._id))
+          data[key].push({
+            _id: patient._id,
+            followUpId: ev._id,
+            date: key,
+            type: "follow-up",
+            start: date.format("YYYY-MM-DD hh:mm"),
+            end: date.endOf("day").format("YYYY-MM-DD hh:mm"),
+            name,
+            color,
+          });
       });
   });
 
