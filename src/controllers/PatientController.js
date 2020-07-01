@@ -158,11 +158,9 @@ export async function search(req, res) {
     .catch((err) => create500(res, err));
 }
 
-export function getAreas(req, res) {
-  PatientModel.find({
-    addedBy: req.user._id,
-  })
-    .select("address")
+export function getOptions(req, res) {
+  PatientModel.find({ addedBy: req.user._id })
+    .select("address occupation")
     .then((patients) => {
       let areas = getDistinct(
         patients.map((ev) => ev.address && ev.address.area)
@@ -170,7 +168,10 @@ export function getAreas(req, res) {
       let pins = getDistinct(
         patients.map((ev) => ev.address && ev.address.pincode)
       ).filter((ev) => !!ev);
-      res.send({ pins, areas });
+      let occupations = getDistinct(patients.map((ev) => ev.occupation)).filter(
+        (ev) => !!ev
+      );
+      res.send({ pins, areas, occupations });
     })
     .catch((err) => create500(res, "Failed to retrive areas", err));
 }

@@ -5,7 +5,7 @@ let router = Router();
 
 router.get("/patient", authenticate, PatientController.getAll);
 router.post("/patient", authenticate, PatientController.create);
-router.get("/patient/areas", authenticate, PatientController.getAreas);
+router.get("/patient/options", authenticate, PatientController.getOptions);
 
 router.get("/search", authenticate, PatientController.search);
 

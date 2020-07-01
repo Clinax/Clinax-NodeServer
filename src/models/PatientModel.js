@@ -36,6 +36,7 @@ var patientSchema = new Schema(
     gender,
     bloodGroup,
     familyHistory: String,
+    occupation: String,
     pastHistory: String,
     medicalNote: String,
     emergencyContacts: [
