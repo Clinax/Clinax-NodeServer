@@ -97,6 +97,8 @@ export async function getFollowUpsMinimal(req, res) {
   }).populate({ path: "patient", select: "name" });
 
   appointments.forEach((appointment) => {
+    if (!appointment.dateTime) return;
+
     let date = moment(appointment.dateTime).tz(req.headers.timezone);
     let key = date.format("YYYY-MM-DD");
 
@@ -118,6 +120,8 @@ export async function getFollowUpsMinimal(req, res) {
       notes: appointment.notes,
     });
   });
+
+  delete data["Invalid date"];
 
   res.json({ compressedData: String(compressToUTF16(JSON.stringify(data))) });
 }
