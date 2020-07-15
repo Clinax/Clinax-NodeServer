@@ -9,11 +9,13 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "start cmd /k nodemon app/index.js && nodemon src --exec babel --presets es2015 -w src/ --out-dir app/",
+    "test": "set NODE_ENV=testing & mocha --require @babel/register './src/test/*.test.js'",
     "build": "babel src --out-dir dist",
     "start": "set NODE_ENV=production & node dist/index.js",
-    "serve": "nodemon --exec babel-node src/index.js"
+    "serve": "set NODE_ENV=development & nodemon --exec babel-node src/index.js",
+    "lint": "eslint \"./**/*.js\" --quiet",
+    "lintFull": "eslint \"./**/*.js\"",
+    "lintFix": "eslint --fix './**/*.js'"
   },
   "keywords": [
     "Management",
@@ -28,23 +30,20 @@
   "dependencies": {
     "@safer-bwd/mongoose-autonumber": "^0.2.2",
     "body-parser": "^1.19.0",
+    "clone": "^2.1.2",
     "compression": "^1.7.4",
-    "connect-mongo": "^3.2.0",
-    "connect-mongodb-session": "^2.3.3",
-    "cookie-parser": "^1.4.5",
-    "cookie-session": "^1.4.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
-    "express-session": "^1.17.1",
     "fs.js": "0.0.1",
     "helmet": "^3.23.1",
     "js-sha256": "^0.9.0",
     "jsonwebtoken": "^8.5.1",
     "lz-string": "^1.4.4",
+    "mocha": "^8.0.1",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
     "mongoose": "^5.9.19",
@@ -55,9 +54,21 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
-    "@babel/core": "^7.10.3",
+    "@babel/core": "^7.10.4",
     "@babel/node": "^7.10.3",
     "@babel/preset-env": "^7.10.3",
+    "@babel/register": "^7.10.4",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.3.1",
     "nodemon": "^1.19.4"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "npm run lint",
+      "git add"
+    ]
   }
 }

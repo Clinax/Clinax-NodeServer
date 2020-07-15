@@ -14,7 +14,6 @@ var patientSchema = new Schema(
     pid: {
       type: String,
       immutable: true,
-      autonumber: true,
       autonumber: {
         prefix: () => "PID-",
       },

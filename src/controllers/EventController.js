@@ -2,11 +2,10 @@ import moment from "moment-timezone";
 import Patient from "../models/Patient";
 import Appointment from "../models/Appointment";
 
-import { create } from "./CaseController";
 import { isValidObjectId } from "mongoose";
 import { getPatientColor } from "../utils";
 import { compressToUTF16 } from "lz-string";
-import { create500 } from "../utils/httpErrors";
+import { create500, create400 } from "../utils/httpErrors";
 
 export function addAppointment(req, res) {
   let entry = new Appointment(req.body);

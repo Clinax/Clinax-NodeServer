@@ -16,10 +16,11 @@ export function create(req, res) {
   var patient = req.body,
     avatarFile = req.files.avatar;
   patient.addedBy = req.user._id;
-  var patient = new Patient(patient);
+
+  patient = new Patient(patient);
 
   if (avatarFile) {
-    let path = `${APP_ROOT}/uploads/img/${patient._id}`;
+    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
     let ext = getExtension(avatarFile.name);
 
@@ -45,7 +46,7 @@ export function update(req, res) {
   if (avatar) {
     updates = updates && JSON.parse(updates);
 
-    let path = `${APP_ROOT}/uploads/img/${patient._id}`;
+    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
 
     patient.avatar = `${patient._id}/${avatar.md5}.jpg`;
