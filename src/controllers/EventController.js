@@ -6,7 +6,7 @@ import { create } from "./CaseController";
 import { isValidObjectId } from "mongoose";
 import { getPatientColor } from "../utils";
 import { compressToUTF16 } from "lz-string";
-import { create500 } from "../modules/httpErrors";
+import { create500 } from "../utils/httpErrors";
 
 export function addAppointment(req, res) {
   let entry = new Appointment(req.body);

@@ -1,6 +1,6 @@
 import User from "../models/User";
 
-import { create500, create409, create400 } from "../modules/httpErrors";
+import { create500, create409, create400 } from "../utils/httpErrors";
 
 export function create(req, res) {
   let user = req.body;

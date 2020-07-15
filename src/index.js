@@ -16,8 +16,8 @@ import { urlencoded, json } from "body-parser";
 import routes from "./routes";
 
 import "./init";
-import queryPaser from "./modules/queryPaser";
-import { create404 } from "./modules/httpErrors";
+import queryPaser from "./utils/queryPaser";
+import { create404 } from "./utils/httpErrors";
 
 global.APP_ROOT = __dirname;
 

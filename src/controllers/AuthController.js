@@ -12,7 +12,7 @@ import {
   create498,
   create500,
   create499,
-} from "../modules/httpErrors";
+} from "../utils/httpErrors";
 
 export const self = (req, res) => res.json(req.user.toObject());
 

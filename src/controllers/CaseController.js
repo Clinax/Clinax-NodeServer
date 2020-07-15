@@ -3,7 +3,7 @@ import Case from "../models/Case";
 import Patient from "../models/Patient";
 import FollowUp from "../models/FollowUp";
 
-import { create500, create400 } from "../modules/httpErrors";
+import { create500, create400 } from "../utils/httpErrors";
 
 export function create(req, res) {
   let _case = new Case(req.body);

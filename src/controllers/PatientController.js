@@ -5,10 +5,10 @@ import Patient from "../models/Patient";
 import FollowUp from "../models/FollowUp";
 
 import { compressToUTF16 } from "lz-string";
-import { getDistinct } from "../modules/list";
-import { getExtension } from "../modules/file";
-import { stringToRegex } from "../modules/regex";
-import { create404, create500, create400 } from "../modules/httpErrors";
+import { getDistinct } from "../utils/list";
+import { getExtension } from "../utils/file";
+import { stringToRegex } from "../utils/regex";
+import { create404, create500, create400 } from "../utils/httpErrors";
 
 export function create(req, res) {
   if (!req.files) req.files = {};
