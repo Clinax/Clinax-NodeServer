@@ -1,12 +1,12 @@
 import { model, Schema } from "mongoose";
-import { SchemaTypes } from "../utils";
+import { trimmedString } from "./types";
 
 const followUpSchema = new Schema(
   {
     caseId: { type: Schema.Types.ObjectId, ref: "case" },
 
-    chiefComplain: SchemaTypes.trimmedString,
-    femaleComplain: SchemaTypes.trimmedString,
+    chiefComplain: trimmedString,
+    femaleComplain: trimmedString,
 
     criteria: { type: {}, default: {} },
     physicalGeneral: { type: {}, default: {} },
@@ -17,14 +17,14 @@ const followUpSchema = new Schema(
       type: new Schema({
         drugs: [
           {
-            name: SchemaTypes.trimmedString,
-            potency: SchemaTypes.trimmedString,
-            dosage: SchemaTypes.trimmedString,
+            name: trimmedString,
+            potency: trimmedString,
+            dosage: trimmedString,
             duration: Number,
           },
         ],
-        parallelTreatment: SchemaTypes.trimmedString,
-        diagnosis: SchemaTypes.trimmedString,
+        parallelTreatment: trimmedString,
+        diagnosis: trimmedString,
       }),
       default: { drugs: [] },
     },
@@ -32,5 +32,7 @@ const followUpSchema = new Schema(
   },
   { timestamps: true }
 );
+
+followUpSchema.set("toObject", { getters: true });
 
 export default model("followUp", followUpSchema);

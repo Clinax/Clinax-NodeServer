@@ -1,11 +1,11 @@
-import UserModel from "../models/UserModel";
+import User from "../models/User";
 
 import { create500, create409, create400 } from "../modules/httpErrors";
 
 export function create(req, res) {
   let user = req.body;
 
-  new UserModel(user)
+  new User(user)
     .save()
     .then((user) => res.json(user.toObject()))
     .catch((err) => {
@@ -39,7 +39,7 @@ export function update(req, res) {
 }
 
 function _delete(req, res) {
-  UserModel.deleteOne({ _id: req.parmas.id })
+  User.deleteOne({ _id: req.parmas.id })
     .then((result) => res.json(result))
     .catch((err) => create500(res, err));
 }

@@ -1,8 +1,7 @@
 import sha256 from "js-sha256";
-import { Schema, model } from "mongoose";
 
-import { gender } from "./metas";
-import fullNameVirtual from "../modules/fullNameVirtual";
+import { Schema, model } from "mongoose";
+import { gender, addFullnameVirtual } from "./types";
 
 var userSchema = new Schema(
   {
@@ -15,10 +14,7 @@ var userSchema = new Schema(
       middle: String,
       last: String,
     },
-    birthDate: {
-      type: Date,
-      alias: "dateOfBirth",
-    },
+    birthDate: { type: Date, alias: "dateOfBirth" },
     gender,
     username: {
       type: String,
@@ -41,11 +37,7 @@ var userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.virtual("initials").get(function () {
-  return this.name.first[0] + (this.name.last[0] || "");
-});
-
-fullNameVirtual(userSchema);
+addFullnameVirtual(userSchema);
 
 userSchema.set("toObject", { virtuals: true });
 
