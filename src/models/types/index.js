@@ -35,12 +35,10 @@ export function addFullnameVirtual(schema) {
   schema.virtual("prefixFullname").get(function () {
     if (!this.name) return;
 
-    return [
-      this.prefix,
-      this.name.first,
-      this.name.middle,
-      this.name.last,
-    ].join(" ");
+    return [this.prefix, this.name.first, this.name.middle, this.name.last]
+      .map((ev) => ev && ev.trim())
+      .filter((ev) => !!ev)
+      .join(" ");
   });
 
   schema
@@ -48,10 +46,13 @@ export function addFullnameVirtual(schema) {
     .get(function () {
       if (!this.name) return;
 
-      return [this.name.first, this.name.middle, this.name.last].join(" ");
+      return [this.name.first, this.name.middle, this.name.last]
+        .map((ev) => ev && ev.trim())
+        .filter((ev) => !!ev)
+        .join(" ");
     })
     .set(function (v) {
-      let t = v.split(" ");
+      let t = v.trim().split(" ");
 
       this.name.first = t[0];
       if (t[2]) {
