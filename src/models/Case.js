@@ -15,6 +15,12 @@ const caseSchema = new Schema(
       type: [{ type: Schema.Types.ObjectId, ref: "followUp" }],
       select: false,
     },
+    investigations: [
+      {
+        name: String,
+        entries: [{ reportDate: Date, values: {} }],
+      },
+    ],
   },
   { timestamps: true }
 );
