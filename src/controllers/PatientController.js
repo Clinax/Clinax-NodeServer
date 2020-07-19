@@ -99,7 +99,7 @@ export function getAll(req, res) {
 }
 
 function _delete(req, res) {
-  Patient.deleteOne({ id: req.params.patientId, addedBy: req.user._id })
+  Patient.deleteOne({ _id: req.params.patientId, addedBy: req.user._id })
     .then((result) => res.send(result))
     .catch((err) => create400(res, "Failed to delete patient", err));
 }
