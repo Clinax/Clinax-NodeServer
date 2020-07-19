@@ -1,15 +1,15 @@
 import { Schema, model } from "mongoose";
-import { SchemaTypes } from "../utils";
+import { trimmedString } from "./types";
 
 const caseSchema = new Schema(
   {
     patient: { type: Schema.Types.ObjectId, ref: "patient", unique: true },
 
-    mind: SchemaTypes.trimmedString,
-    duringAcute: SchemaTypes.trimmedString,
-    pastHistory: SchemaTypes.trimmedString,
-    familyHistory: SchemaTypes.trimmedString,
-    medicalNote: SchemaTypes.trimmedString,
+    mind: trimmedString,
+    duringAcute: trimmedString,
+    pastHistory: trimmedString,
+    familyHistory: trimmedString,
+    medicalNote: trimmedString,
 
     followUps: {
       type: [{ type: Schema.Types.ObjectId, ref: "followUp" }],

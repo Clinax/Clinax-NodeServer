@@ -1,17 +1,14 @@
 import moment from "moment-timezone";
+import Patient from "../models/Patient";
+import Appointment from "../models/Appointment";
 
 import { isValidObjectId } from "mongoose";
-import { compressToUTF16 } from "lz-string";
-
 import { getPatientColor } from "../utils";
-import { create500 } from "../modules/httpErrors";
-
-import AppointmentModel from "../models/AppointmentModel";
-import PatientModel from "../models/PatientModel";
-import { create } from "./CaseController";
+import { compressToUTF16 } from "lz-string";
+import { create500, create400 } from "../utils/httpErrors";
 
 export function addAppointment(req, res) {
-  let entry = new AppointmentModel(req.body);
+  let entry = new Appointment(req.body);
 
   entry.user = req.user._id;
 
@@ -25,23 +22,21 @@ export function updateAppointment(req, res) {
   if (!isValidObjectId(req.params.appointmentId))
     return create400(res, "Update failed", new Error("Invalid appointment id"));
 
-  AppointmentModel.findByIdAndUpdate(
-    req.params.appointmentId,
-    req.body.updates,
-    { new: true }
-  )
+  Appointment.findByIdAndUpdate(req.params.appointmentId, req.body.updates, {
+    new: true,
+  })
     .then((appointment) => res.json(appointment.toObject()))
     .catch((err) => create500(res, err));
 }
 
 export function deleteAppointment(req, res) {
-  AppointmentModel.deleteOne({ _id: req.params.appointmentId })
+  Appointment.deleteOne({ _id: req.params.appointmentId })
     .then(() => res.json("ok"))
     .catch((err) => create500(res, err));
 }
 
 export function getAppointments(req, res) {
-  AppointmentModel.find({
+  Appointment.find({
     user: req.user._id,
     dateTime: {
       $gte: moment(req.queryParams.from).startOf("day").toDate(),
@@ -54,7 +49,7 @@ export function getAppointments(req, res) {
 }
 
 export async function getFollowUpsMinimal(req, res) {
-  let patients = await PatientModel.find({ addedBy: req.user._id })
+  let patients = await Patient.find({ addedBy: req.user._id })
     .populate({
       path: "case",
       populate: { path: "followUps", select: "nextFollowUpDate" },
@@ -92,7 +87,7 @@ export async function getFollowUpsMinimal(req, res) {
       });
   });
 
-  let appointments = await AppointmentModel.find({
+  let appointments = await Appointment.find({
     user: req.user._id,
   }).populate({ path: "patient", select: "name" });
 

@@ -1,14 +1,14 @@
 import fs from "fs";
 
-import PatientModel from "../models/PatientModel";
-import CaseModel from "../models/CaseModel";
-import FollowUpModel from "../models/FollowUpModel";
+import Case from "../models/Case";
+import Patient from "../models/Patient";
+import FollowUp from "../models/FollowUp";
 
-import { create404, create500, create400 } from "../modules/httpErrors";
-import { getExtension } from "../modules/file";
-import { stringToRegex } from "../modules/regex";
-import { getDistinct } from "../modules/list";
 import { compressToUTF16 } from "lz-string";
+import { getDistinct } from "../utils/list";
+import { getExtension } from "../utils/file";
+import { stringToRegex } from "../utils/regex";
+import { create404, create500, create400 } from "../utils/httpErrors";
 
 export function create(req, res) {
   if (!req.files) req.files = {};
@@ -16,10 +16,11 @@ export function create(req, res) {
   var patient = req.body,
     avatarFile = req.files.avatar;
   patient.addedBy = req.user._id;
-  var patient = new PatientModel(patient);
+
+  patient = new Patient(patient);
 
   if (avatarFile) {
-    let path = `${APP_ROOT}/uploads/img/${patient._id}`;
+    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
     let ext = getExtension(avatarFile.name);
 
@@ -27,7 +28,7 @@ export function create(req, res) {
     avatarFile.mv(`${path}/${avatarFile.md5}.jpg`);
   }
 
-  let _case = new CaseModel({});
+  let _case = new Case({});
   _case.patient = patient._id;
   _case.save();
 
@@ -45,7 +46,7 @@ export function update(req, res) {
   if (avatar) {
     updates = updates && JSON.parse(updates);
 
-    let path = `${APP_ROOT}/uploads/img/${patient._id}`;
+    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
 
     patient.avatar = `${patient._id}/${avatar.md5}.jpg`;
@@ -58,7 +59,7 @@ export function update(req, res) {
 }
 
 export function getAll(req, res) {
-  PatientModel.find({ addedBy: req.user._id })
+  Patient.find({ addedBy: req.user._id })
     .populate({
       path: "case",
       populate: { path: "followUps", select: "treatment.diagnosis createdAt" },
@@ -98,7 +99,7 @@ export function getAll(req, res) {
 }
 
 function _delete(req, res) {
-  PatientModel.deleteOne({ id: req.params.patientId, addedBy: req.user._id })
+  Patient.deleteOne({ _id: req.params.patientId, addedBy: req.user._id })
     .then((result) => res.send(result))
     .catch((err) => create400(res, "Failed to delete patient", err));
 }
@@ -122,10 +123,10 @@ export async function search(req, res) {
   ];
 
   if (req.queryParams.minimal != "true") {
-    let follows = await FollowUpModel.find({
+    let follows = await FollowUp.find({
       $or: [{ chiefComplain: regex }, { "treatment.diagnosis": regex }],
     }).select("_id");
-    let cases = await CaseModel.find({
+    let cases = await Case.find({
       followUps: { $in: follows.map((ev) => ev._id) },
     }).select("patient");
 
@@ -134,7 +135,7 @@ export async function search(req, res) {
     });
   }
 
-  let query = PatientModel.find({ $or: queries });
+  let query = Patient.find({ $or: queries });
 
   if (req.queryParams.minimal == "true") query.select("name email");
   else
@@ -159,7 +160,7 @@ export async function search(req, res) {
 }
 
 export function getOptions(req, res) {
-  PatientModel.find({ addedBy: req.user._id })
+  Patient.find({ addedBy: req.user._id })
     .select("address occupation")
     .then((patients) => {
       let areas = getDistinct(
@@ -171,6 +172,7 @@ export function getOptions(req, res) {
       let occupations = getDistinct(patients.map((ev) => ev.occupation)).filter(
         (ev) => !!ev
       );
+
       res.send({ pins, areas, occupations });
     })
     .catch((err) => create500(res, "Failed to retrive areas", err));
@@ -180,7 +182,7 @@ export function getOptions(req, res) {
  * Function find patient and add patient object to incoming request
  */
 export function getPatient(req, res, next) {
-  PatientModel.findOne({
+  Patient.findOne({
     _id: req.params.patientId,
     addedBy: req.user._id,
   })
@@ -198,7 +200,7 @@ export function getPatient(req, res, next) {
  * Also populate case and followUps
  */
 export function getPatientWithCase(req, res, next) {
-  PatientModel.findOne({
+  Patient.findOne({
     _id: req.params.patientId,
     addedBy: req.user._id,
   })

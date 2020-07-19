@@ -1,18 +1,20 @@
-import { model, Schema } from "mongoose";
-import { addressSchema, bloodGroup, gender } from "./metas";
-
-import fullNameVirtual from "../modules/fullNameVirtual";
 import autoNumberPlugin from "@safer-bwd/mongoose-autonumber";
+
+import { model, Schema } from "mongoose";
+import {
+  gender,
+  bloodGroup,
+  addAgeVirtual,
+  addressSchema,
+  addFullnameVirtual,
+} from "./types";
 
 var patientSchema = new Schema(
   {
     pid: {
       type: String,
       immutable: true,
-      autonumber: true,
-      autonumber: {
-        prefix: () => "PID-",
-      },
+      autonumber: { prefix: () => "PID-" },
     },
     avatar: { type: String, trim: true },
     prefix: String,
@@ -71,27 +73,10 @@ patientSchema.pre("save", function (next) {
 
 // patientSchema.index({ "$**": "text" });
 patientSchema.plugin(autoNumberPlugin);
-fullNameVirtual(patientSchema);
 
-patientSchema.virtual("age").get(function () {
-  if (!this.birthDate) return;
+addFullnameVirtual(patientSchema);
 
-  let dateDif = new Date(Date.now() - this.birthDate.getTime());
-  return dateDif.getFullYear() - 1970;
-});
-
-patientSchema.virtual("ageDetailed").get(function () {
-  if (!this.birthDate) return;
-
-  let dateDif = new Date(Date.now() - this.birthDate.getTime());
-
-  let year = dateDif.getFullYear() - 1970;
-  let month = dateDif.getMonth();
-  let date = dateDif.getDate();
-
-  // `${year} Years and ${month} months`;
-  return { year, month, date };
-});
+addAgeVirtual(patientSchema, "birthDate");
 
 patientSchema.set("toObject", { getters: true });
 

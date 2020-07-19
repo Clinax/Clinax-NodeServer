@@ -1,10 +1,10 @@
 require("dotenv").config();
 
 import jwt from "jsonwebtoken";
-import { sha256 } from "js-sha256";
+import User from "../models/User";
+import LoginRecord from "../models/LoginRecord";
 
-import UserModel from "../models/UserModel";
-import LoginRecordModel from "../models/LoginRecordModel";
+import { sha256 } from "js-sha256";
 import {
   create400,
   create403,
@@ -12,7 +12,7 @@ import {
   create498,
   create500,
   create499,
-} from "../modules/httpErrors";
+} from "../utils/httpErrors";
 
 export const self = (req, res) => res.json(req.user.toObject());
 
@@ -20,7 +20,7 @@ export function login(req, res) {
   if (!req.body.username || !req.body.password)
     return create400(res, "Missing username or password");
 
-  UserModel.findOne({ username: req.body.username })
+  User.findOne({ username: req.body.username })
     .select("+password")
     .then((user) => {
       if (!user)
@@ -32,7 +32,7 @@ export function login(req, res) {
       if (user.password == sha256(req.body.password))
         return create403(res, "Password or username is incorrect");
 
-      new LoginRecordModel({
+      new LoginRecord({
         user: user._id,
         ip: req.clientIp,
         userAgent: req.headers["user-agent"],
@@ -59,7 +59,7 @@ export function authenticate(req, res, next) {
   jwt.verify(token, process.env.JWT_SIGNING_KEY, (err, decoded) => {
     if (err) return create498(res, "Verification Failed", err);
 
-    UserModel.findById(decoded.id)
+    User.findById(decoded.id)
       .then((user) => {
         if (!user) return create404(res, "User is deleted");
 

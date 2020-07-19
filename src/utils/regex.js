@@ -1,6 +1,11 @@
-export const PHONE_REGEX = /^(?:([+][1-9][0-9]{1,2}\s|))([789][0-9]{9})$/gm;
-export const EMAIL_REGEX = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/gm;
+// eslint-disable-next-line
+export const EMAIL_REGEX = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/gm;
+// eslint-disable-next-line
+export const URL_REGEX = /((https?:\/\/(?:www\.|(?!www)))?[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|(https?:\/\/(?:www\.|(?!www)))?[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gim;
 
-export const checkPhone = v => PHONE_REGEX.test(v);
+export function stringToRegex(input) {
+  // eslint-disable-next-line
+  input = input && input.trim().replace(/[\[\]\\\^\$\.\|\?\*\+\(\)]/g, "");
 
-export const checkEmail = v => EMAIL_REGEX.test(v);
+  return input && new RegExp(input, "ig");
+}
