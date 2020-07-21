@@ -1,10 +1,10 @@
 import { Schema, model } from "mongoose";
-import { trimmedString } from "./types";
+import { trimmedString, user, patient } from "./types";
 
 const appointmentSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: "user", required: true },
-    patient: { type: Schema.Types.ObjectId, ref: "patient", immutable: false },
+    user,
+    patient,
     name: trimmedString,
     contact: trimmedString,
     notes: trimmedString,

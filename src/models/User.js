@@ -1,19 +1,18 @@
 import sha256 from "js-sha256";
 
 import { Schema, model } from "mongoose";
-import { gender, addFullnameVirtual } from "./types";
+import {
+  gender,
+  addFullnameVirtual,
+  detailedname,
+  email,
+  avatar,
+} from "./types";
 
 var userSchema = new Schema(
   {
-    avatar: { type: String, trim: true },
-    name: {
-      first: {
-        type: String,
-        required: [true, "Name is required"],
-      },
-      middle: String,
-      last: String,
-    },
+    avatar,
+    name: detailedname,
     birthDate: { type: Date, alias: "dateOfBirth" },
     gender,
     username: {
@@ -21,12 +20,8 @@ var userSchema = new Schema(
       required: [true, "Username is required"],
       unique: true,
     },
-    phoneNumber: String,
-    email: {
-      unique: true,
-      type: String,
-      lowercase: true,
-    },
+    phone: String,
+    email: { ...email, unique: true },
     password: {
       type: String,
       select: false,

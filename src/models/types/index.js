@@ -1,6 +1,70 @@
 import { Schema } from "mongoose";
+import validate from "mongoose-validator";
 
 export const trimmedString = { type: String, trim: true };
+
+export const email = {
+  ...trimmedString,
+  lowercase: true,
+  validate: [
+    validate({
+      validator: "isEmail",
+      passIfEmpty: true,
+      message: "Invalid Email",
+    }),
+  ],
+};
+
+export const url = {
+  ...trimmedString,
+  validate: [validate({ validator: "isURL" })],
+};
+
+export const avatar = { ...url };
+
+export const detailedname = {
+  prefix: trimmedString,
+  first: trimmedString,
+  middle: trimmedString,
+  last: trimmedString,
+};
+
+export const bloodGroup = {
+  type: String,
+  enum: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-", "unknown"],
+  lowercase: true,
+  default: "unknown",
+};
+
+export const addressSchema = new Schema(
+  {
+    street: trimmedString,
+    area: trimmedString,
+    pincode: {
+      type: String,
+      validate: (v) => String(v).length == 6,
+    },
+  },
+  { timestamps: false }
+);
+
+export const gender = {
+  type: String,
+  lowercase: true,
+  enum: ["male", "female", "non-binary"],
+};
+
+export const user = {
+  type: Schema.Types.ObjectId,
+  required: true,
+  ref: "user",
+};
+
+export const patient = {
+  type: Schema.Types.ObjectId,
+  required: true,
+  ref: "patient",
+};
 
 export function addAgeVirtual(schema, datefield) {
   schema.virtual("age").get(function () {
@@ -36,11 +100,14 @@ export function addFullnameVirtual(schema) {
     if (!this.name) return;
 
     return [
-      this.prefix,
+      this.prefix || this.name.prefix,
       this.name.first,
       this.name.middle,
       this.name.last,
-    ].join(" ");
+    ]
+      .map((e) => e && e.trim())
+      .filter((e) => !!e)
+      .join(" ");
   });
 
   schema
@@ -48,7 +115,10 @@ export function addFullnameVirtual(schema) {
     .get(function () {
       if (!this.name) return;
 
-      return [this.name.first, this.name.middle, this.name.last].join(" ");
+      return [this.name.first, this.name.middle, this.name.last]
+        .map((e) => e && e.trim())
+        .filter((e) => !!e)
+        .join(" ");
     })
     .set(function (v) {
       let t = v.split(" ");
@@ -63,28 +133,3 @@ export function addFullnameVirtual(schema) {
       }
     });
 }
-
-export const bloodGroup = {
-  type: String,
-  enum: ["a+", "b+", "o+", "ab+", "a-", "b-", "o-", "ab-", "unknown"],
-  lowercase: true,
-  default: "unknown",
-};
-
-export const addressSchema = new Schema(
-  {
-    street: trimmedString,
-    area: trimmedString,
-    pincode: {
-      type: String,
-      validate: (v) => String(v).length == 6,
-    },
-  },
-  { timestamps: false }
-);
-
-export const gender = {
-  type: String,
-  lowercase: true,
-  enum: ["male", "female", "non-binary"],
-};

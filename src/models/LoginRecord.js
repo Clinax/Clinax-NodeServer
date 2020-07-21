@@ -1,16 +1,20 @@
 import { Schema, model } from "mongoose";
+import { user } from "./types";
+import validate from "mongoose-validator";
 
 const loginRecordSchema = new Schema(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      required: true,
-    },
+    user: user,
     userAgent: String,
     ip: {
       type: String,
-      required: true,
-      default: "-",
+      validate: [
+        validate({
+          validator: "isIP",
+          passIfEmpty: true,
+          message: "Invalid IP",
+        }),
+      ],
     },
   },
   { timestamps: true }

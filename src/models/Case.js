@@ -1,9 +1,9 @@
 import { Schema, model } from "mongoose";
-import { trimmedString } from "./types";
+import { trimmedString, patient } from "./types";
 
 const caseSchema = new Schema(
   {
-    patient: { type: Schema.Types.ObjectId, ref: "patient", unique: true },
+    patient: { ...patient, unique: true },
 
     mind: trimmedString,
     duringAcute: trimmedString,
