@@ -20,7 +20,8 @@ export const url = {
   validate: [validate({ validator: "isURL" })],
 };
 
-export const avatar = { ...url };
+// todo url validition issue
+export const avatar = { type: String };
 
 export const detailedname = {
   prefix: trimmedString,
@@ -66,7 +67,7 @@ export const patient = {
   ref: "patient",
 };
 
-export function addAgeVirtual(schema, datefield) {
+export function addAgeVirtual(schema, datefield, ageDetails = false) {
   schema.virtual("age").get(function () {
     if (!this[datefield]) return;
 
@@ -74,25 +75,29 @@ export function addAgeVirtual(schema, datefield) {
     return dateDif.getFullYear() - 1970;
   });
 
-  schema.virtual("ageDetailed").get(function () {
-    if (!this[datefield]) return;
+  if (ageDetails)
+    schema.virtual("ageDetails").get(function () {
+      if (!this[datefield]) return;
+      let dateDif = new Date(Date.now() - this[datefield].getTime());
+      let year = dateDif.getFullYear() - 1970;
+      let month = dateDif.getMonth();
+      let days = dateDif.getDate();
 
-    let dateDif = new Date(Date.now() - this[datefield].getTime());
-
-    let year = dateDif.getFullYear() - 1970;
-    let month = dateDif.getMonth();
-    let date = dateDif.getDate();
-
-    // `${year} Years and ${month} months`;
-    return { year, month, date };
-  });
+      return {
+        year,
+        month,
+        days,
+        statement: `${year} Years and ${month} months`,
+      };
+    });
 }
 
 export function addFullnameVirtual(schema) {
   schema.virtual("initials").get(function () {
     return (
       this.name &&
-      this.name.first[0] + ((this.name.last && this.name.last[0]) || "")
+      ((this.name.first && this.name.first[0]) || "") +
+        ((this.name.last && this.name.last[0]) || "")
     );
   });
 
@@ -133,3 +138,14 @@ export function addFullnameVirtual(schema) {
       }
     });
 }
+
+export const contactType = {
+  type: String,
+  // enum: [
+  //   "Patient",
+  //   "Hospital",
+  //   "doctor",
+  //   "Medical Representative (MR)",
+  //   "Other",
+  // ],
+};

@@ -3,6 +3,7 @@ import PatientRouter from "./PatientRouter";
 import CaseRouter from "./CaseRouter";
 import UserRouter from "./UserRouter";
 import EventsRouter from "./EventsRouter";
+import ContactRouter from "./ContactRouter";
 
 export default function (app) {
   app.use(AuthRouter);
@@ -14,4 +15,6 @@ export default function (app) {
   app.use(CaseRouter);
 
   app.use(EventsRouter);
+
+  app.use(ContactRouter);
 }
