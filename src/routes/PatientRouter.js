@@ -21,6 +21,7 @@ router.put(
   PatientController.getPatient,
   PatientController.update
 );
+
 router.delete("/patient/:patientId", authenticate, PatientController.delete);
 
 export default router;

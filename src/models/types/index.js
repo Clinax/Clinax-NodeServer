@@ -126,7 +126,7 @@ export function addFullnameVirtual(schema) {
         .join(" ");
     })
     .set(function (v) {
-      let t = v.split(" ");
+      let t = v.trim().split(" ");
 
       this.name.first = t[0];
       if (t[2]) {
