@@ -33,6 +33,13 @@ const followUpSchema = new Schema(
   { timestamps: true }
 );
 
+followUpSchema.virtual("fee", {
+  ref: "followUpFee",
+  localField: "_id",
+  foreignField: "followUp",
+  justOne: true,
+});
+
 followUpSchema.set("toObject", { getters: true });
 
 export default model("followUp", followUpSchema);

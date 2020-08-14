@@ -2,11 +2,16 @@ import autoNumberPlugin from "@safer-bwd/mongoose-autonumber";
 
 import { model, Schema } from "mongoose";
 import {
+  user,
+  email,
   gender,
+  avatar,
   bloodGroup,
   addAgeVirtual,
   addressSchema,
+  detailedname,
   addFullnameVirtual,
+  trimmedString,
 } from "./types";
 
 var patientSchema = new Schema(
@@ -16,43 +21,31 @@ var patientSchema = new Schema(
       immutable: true,
       autonumber: { prefix: () => "PID-" },
     },
-    avatar: { type: String, trim: true },
-    prefix: String,
-    name: {
-      first: {
-        type: String,
-        select: true,
-        required: [true, "Name is required"],
-      },
-      middle: String,
-      last: { type: String, select: true },
-    },
+    avatar,
+    prefix: trimmedString,
+    name: detailedname,
     maritalStatus: {
       type: String,
       enum: ["Single", "Married", "Divorced", "Widowed", "Separated"],
     },
     address: addressSchema,
-    phone: String,
-    email: { type: String, lowercase: true },
+    phone: trimmedString,
+    email,
     birthDate: Date,
     gender,
     bloodGroup,
-    familyHistory: String,
-    occupation: String,
-    pastHistory: String,
-    medicalNote: String,
+    familyHistory: trimmedString,
+    occupation: trimmedString,
+    pastHistory: trimmedString,
+    medicalNote: trimmedString,
     emergencyContacts: [
       {
-        name: String,
-        phone: String,
-        relation: String,
+        name: trimmedString,
+        phone: trimmedString,
+        relation: trimmedString,
       },
     ],
-    addedBy: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: "doctor",
-    },
+    addedBy: user,
     createdAt: { type: Date, immutable: true, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
