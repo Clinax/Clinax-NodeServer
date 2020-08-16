@@ -24,7 +24,7 @@ export async function getContacts(req, res) {
         autoAdded: true,
         color: getPatientColor(patient._id),
         name: { ...patient.name, prefix: patient.prefix },
-        displayName: patient.prefixFullname || patient.phone || patient.email,
+        displayName: patient.fullname || patient.phone || patient.email,
       })),
   ];
 
@@ -62,7 +62,7 @@ export async function updateContact(req, res) {
             autoAdded: true,
             color: getPatientColor(model._id),
             name: { ...model.name, prefix: model.prefix },
-            displayName: model.prefixFullname || model.phone || model.email,
+            displayName: model.fullname || model.phone || model.email,
           }
         : { ...model.toObject(), color: getPatientColor(model._id) }
     )
