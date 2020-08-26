@@ -1,24 +1,19 @@
 import { Schema, model } from "mongoose";
-
-const amount = {
-  type: Number,
-  min: 0,
-  default: () => 0,
-};
+import { amountType } from "./types";
 
 const feeSchema = new Schema(
   {
     patient: { type: Schema.Types.ObjectId, ref: "patient" },
     followup: { type: Schema.Types.ObjectId, ref: "followUp" },
     paid: { type: Boolean, default: () => false },
-    visitingCharges: amount,
-    extraCharges: [{ name: String, amount }],
+    visitingCharges: amountType,
+    extraCharges: [{ name: String, amountType }],
   },
   { timestamps: true }
 );
 
 feeSchema.virtual("totalCharge").get(function () {
-  let amount = this.extraCharges
+  const amount = this.extraCharges
     .map((e) => e.amount)
     .reduce((a, b) => a + b, 0);
   return this.visitingCharges + amount;

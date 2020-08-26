@@ -1,9 +1,4 @@
-require("dotenv").config();
-
 import jwt from "jsonwebtoken";
-import User from "../models/User";
-import LoginRecord from "../models/LoginRecord";
-
 import { sha256 } from "js-sha256";
 import {
   create400,
@@ -12,7 +7,11 @@ import {
   create498,
   create500,
   create499,
-} from "../utils/httpErrors";
+} from "@pranavraut033/js-utils/utils/httpErrors";
+import User from "../models/User";
+import LoginRecord from "../models/LoginRecord";
+
+require("dotenv").config();
 
 export const self = (req, res) => res.json(req.user.toObject());
 
@@ -29,7 +28,7 @@ export function login(req, res) {
           `User with username '${req.body.username}' not found`
         );
 
-      if (user.password == sha256(req.body.password))
+      if (user.password === sha256(req.body.password))
         return create403(res, "Password or username is incorrect");
 
       new LoginRecord({
@@ -38,20 +37,20 @@ export function login(req, res) {
         userAgent: req.headers["user-agent"],
       }).save();
 
-      let token = jwt.sign({ id: user._id }, process.env.JWT_SIGNING_KEY, {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SIGNING_KEY, {
         expiresIn: "30 day",
       });
 
-      user = user.toObject();
-      delete user.password;
+      const userObject = user.toObject();
+      delete userObject.password;
 
-      res.json({ token, user });
+      res.json({ token, user: userObject });
     })
-    .catch((err) => create500(res, err));
+    .catch(create500.bind(null, res));
 }
 
 export function authenticate(req, res, next) {
-  let token =
+  const token =
     req.headers.authorization && req.headers.authorization.split(" ")[1];
 
   if (!token) return create499(res, "Missing Token");
@@ -66,6 +65,6 @@ export function authenticate(req, res, next) {
         req.user = user;
         next();
       })
-      .catch((err) => create500(res, err));
+      .catch(create500.bind(null, res));
   });
 }

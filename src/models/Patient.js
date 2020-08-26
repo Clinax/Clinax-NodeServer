@@ -14,7 +14,7 @@ import {
   trimmedString,
 } from "./types";
 
-var patientSchema = new Schema(
+const patientSchema = new Schema(
   {
     pid: {
       type: String,

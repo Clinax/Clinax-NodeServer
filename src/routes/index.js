@@ -1,9 +1,9 @@
-import AuthRouter from "./AuthRouter";
-import PatientRouter from "./PatientRouter";
-import CaseRouter from "./CaseRouter";
-import UserRouter from "./UserRouter";
-import EventsRouter from "./EventsRouter";
-import ContactRouter from "./ContactRouter";
+import AuthRouter from "./Auth.router";
+import PatientRouter from "./Patient.router";
+import CaseRouter from "./Case.router";
+import UserRouter from "./User.router";
+import EventsRouter from "./Events.router";
+import ContactRouter from "./Contact.router";
 
 export default function (app) {
   app.use(AuthRouter);

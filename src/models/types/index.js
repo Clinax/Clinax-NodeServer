@@ -21,7 +21,7 @@ export const url = {
 };
 
 // todo url validition issue
-export const avatar = { type: String };
+export const avatar = url;
 
 export const detailedname = {
   prefix: trimmedString,
@@ -39,11 +39,16 @@ export const bloodGroup = {
 
 export const addressSchema = new Schema(
   {
+    visibility: {
+      type: String,
+      enum: ["public", "private", "request"],
+      default: "private",
+    },
     street: trimmedString,
     area: trimmedString,
     pincode: {
       type: String,
-      validate: (v) => String(v).length == 6,
+      validate: (v) => String(v).length === 6,
     },
   },
   { timestamps: false }
@@ -71,17 +76,17 @@ export function addAgeVirtual(schema, datefield, ageDetails = false) {
   schema.virtual("age").get(function () {
     if (!this[datefield]) return;
 
-    let dateDif = new Date(Date.now() - this[datefield].getTime());
+    const dateDif = new Date(Date.now() - this[datefield].getTime());
     return dateDif.getFullYear() - 1970;
   });
 
   if (ageDetails)
     schema.virtual("ageDetails").get(function () {
       if (!this[datefield]) return;
-      let dateDif = new Date(Date.now() - this[datefield].getTime());
-      let year = dateDif.getFullYear() - 1970;
-      let month = dateDif.getMonth();
-      let days = dateDif.getDate();
+      const dateDif = new Date(Date.now() - this[datefield].getTime());
+      const year = dateDif.getFullYear() - 1970;
+      const month = dateDif.getMonth();
+      const days = dateDif.getDate();
 
       return {
         year,
@@ -126,18 +131,22 @@ export function addFullnameVirtual(schema) {
         .join(" ");
     })
     .set(function (v) {
-      let t = v.trim().split(" ");
+      const t = v.trim().split(" ");
 
-      this.name.first = t[0];
       if (t[2]) {
-        this.name.middle = t[1];
-        this.name.last = t[2];
+        [this.name.first, this.name.middle, this.name.last] = t;
       } else {
-        this.name.last = t[1];
+        [this.name.first, this.name.last] = t;
         this.name.middle = "";
       }
     });
 }
+
+export const amountType = {
+  type: Number,
+  min: 0,
+  default: () => 0,
+};
 
 export const contactType = {
   type: String,
