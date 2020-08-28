@@ -9,7 +9,7 @@ import {
   avatar,
 } from "./types";
 
-var userSchema = new Schema(
+const userSchema = new Schema(
   {
     avatar,
     name: detailedname,

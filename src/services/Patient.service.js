@@ -1,64 +1,69 @@
 import fs from "fs";
 
+import { compressToUTF16 } from "lz-string";
+import { getExtension } from "@pranavraut033/js-utils/utils/file";
+import { stringToRegex } from "@pranavraut033/js-utils/utils/regex";
+import {
+  create404,
+  create500,
+  create400,
+} from "@pranavraut033/js-utils/utils/httpErrors";
 import Case from "../models/Case";
 import Patient from "../models/Patient";
 import FollowUp from "../models/FollowUp";
 
-import { compressToUTF16 } from "lz-string";
-import { getDistinct } from "../utils/list";
-import { getExtension } from "../utils/file";
-import { stringToRegex } from "../utils/regex";
-import { create404, create500, create400 } from "../utils/httpErrors";
+import { validateAndSave } from "../controllers/Patient.controller";
+import { getDistinctProp as _getDistinctProp } from "../utils";
 
-export function create(req, res) {
+export function createPatient(req, res) {
   if (!req.files) req.files = {};
 
-  var patient = req.body,
-    avatarFile = req.files.avatar;
+  let patient = req.body;
+  const avatarFile = req.files.avatar;
   patient.addedBy = req.user._id;
 
   patient = new Patient(patient);
 
   if (avatarFile) {
-    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
+    const path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
-    let ext = getExtension(avatarFile.name);
+    const ext = getExtension(avatarFile.name);
 
     patient.avatar = `${patient._id}/${avatarFile.md5}.${ext}`;
     avatarFile.mv(`${path}/${avatarFile.md5}.jpg`);
   }
 
-  let _case = new Case({});
+  const _case = new Case({});
   _case.patient = patient._id;
   _case.save();
 
   validateAndSave(res, patient);
 }
 
-export const get = (req, res) => res.json(req.patient.toObject());
+export const getPatient = (req, res) => res.json(req.patient.toObject());
 
-export function update(req, res) {
-  let patient = req.patient;
+export function updatePatinet(req, res) {
+  const { patient } = req;
 
-  var updates = req.body.updates,
-    avatar = req.files && req.files.avatar;
+  let { updates } = req.body;
+  const avatar = req.files && req.files.avatar;
 
   if (avatar) {
     updates = updates && JSON.parse(updates);
 
-    let path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
+    const path = `${global.APP_ROOT}/uploads/img/${patient._id}`;
     fs.mkdir(path, () => {});
 
     patient.avatar = `${patient._id}/${avatar.md5}.jpg`;
     avatar.mv(`${path}/${avatar.md5}.jpg`);
   }
 
-  if (updates) for (var attr in req.body.updates) patient[attr] = updates[attr];
+  if (updates) Object.assign(patient, req.body.updates);
 
   validateAndSave(res, patient);
 }
 
-export function getAll(req, res) {
+export function getPatinets(req, res) {
   Patient.find({ addedBy: req.user._id })
     .populate({
       path: "case",
@@ -67,52 +72,49 @@ export function getAll(req, res) {
     })
     .then((patients) =>
       res.send(
-        patients.map((ev) => {
-          ev = ev.toObject();
-          let temp = ev.case.followUps
-            .map(
-              (ev) =>
-                ev.treatment && {
-                  diagnosis: ev.treatment.diagnosis,
-                  createdAt: ev.createdAt,
-                }
-            )
-            .filter((ev) => !!ev);
+        patients.map((_patient) => {
+          const patient = _patient.toObject();
+          const temp = patient.case.followUps
+            .filter((followUp) => followUp.treatment)
+            .map((followUp) => ({
+              diagnosis: followUp.treatment.diagnosis,
+              createdAt: followUp.createdAt,
+            }));
 
           if (temp && temp.length) {
-            ev.diagnosis = temp[temp.length - 1].diagnosis;
-            ev.diagnosedAt = temp[temp.length - 1].createdAt;
-            ev.diagnoses = {};
+            patient.diagnosis = temp[temp.length - 1].diagnosis;
+            patient.diagnosedAt = temp[temp.length - 1].createdAt;
+            patient.diagnoses = {};
+
             temp.forEach((e) => {
-              let a = ev.diagnoses[e.diagnosis];
-              ev.diagnoses[e.diagnosis] =
+              const a = patient.diagnoses[e.diagnosis];
+              patient.diagnoses[e.diagnosis] =
                 a && a < e.createdAt ? a : e.createdAt;
             });
           }
 
-          ev.case = ev.case._id;
-          return ev;
+          patient.case = patient.case._id;
+          return patient;
         })
       )
     )
     .catch((err) => create500(res, "Failed to retrive patients details", err));
 }
 
-function _delete(req, res) {
+export function deletePatient(req, res) {
   Patient.deleteOne({ _id: req.params.patientId, addedBy: req.user._id })
     .then((result) => res.send(result))
     .catch((err) => create400(res, "Failed to delete patient", err));
 }
-export { _delete as delete };
 
-export async function search(req, res) {
+export async function searchPatient(req, res) {
   let regex = stringToRegex(req.queryParams.search);
 
   if (!regex) return res.json([]);
 
   regex = { $regex: regex };
 
-  let queries = [
+  const queries = [
     { "name.first": regex },
     { "name.middle": regex },
     { "name.last": regex },
@@ -122,11 +124,11 @@ export async function search(req, res) {
     { "address.area": regex },
   ];
 
-  if (req.queryParams.minimal != "true") {
-    let follows = await FollowUp.find({
+  if (req.queryParams.minimal !== "true") {
+    const follows = await FollowUp.find({
       $or: [{ chiefComplain: regex }, { "treatment.diagnosis": regex }],
     }).select("_id");
-    let cases = await Case.find({
+    const cases = await Case.find({
       followUps: { $in: follows.map((ev) => ev._id) },
     }).select("patient");
 
@@ -135,9 +137,9 @@ export async function search(req, res) {
     });
   }
 
-  let query = Patient.find({ $or: queries });
+  const query = Patient.find({ $or: queries });
 
-  if (req.queryParams.minimal == "true") query.select("name email");
+  if (req.queryParams.minimal === "true") query.select("name email");
   else
     query.populate({
       path: "case",
@@ -159,19 +161,15 @@ export async function search(req, res) {
     .catch((err) => create500(res, err));
 }
 
-export function getOptions(req, res) {
+export function getAutofillData(req, res) {
   Patient.find({ addedBy: req.user._id })
     .select("address occupation")
     .then((patients) => {
-      let areas = getDistinct(
-        patients.map((ev) => ev.address && ev.address.area)
-      ).filter((ev) => !!ev);
-      let pins = getDistinct(
-        patients.map((ev) => ev.address && ev.address.pincode)
-      ).filter((ev) => !!ev);
-      let occupations = getDistinct(patients.map((ev) => ev.occupation)).filter(
-        (ev) => !!ev
-      );
+      const getDistinctProp = _getDistinctProp.bind(null, patients);
+
+      const areas = getDistinctProp((ev) => ev.address && ev.address.area);
+      const pins = getDistinctProp((ev) => ev.address && ev.address.pincode);
+      const occupations = getDistinctProp((ev) => ev.occupation);
 
       res.send({ pins, areas, occupations });
     })
@@ -181,7 +179,7 @@ export function getOptions(req, res) {
 /**
  * Function find patient and add patient object to incoming request
  */
-export function getPatient(req, res, next) {
+export function findPatient(req, res, next) {
   Patient.findOne({
     _id: req.params.patientId,
     addedBy: req.user._id,
@@ -212,15 +210,4 @@ export function getPatientWithCase(req, res, next) {
       next();
     })
     .catch((err) => create500(res, `Failed to retrive patient`, err));
-}
-
-function validateAndSave(res, patient) {
-  patient.validate((err) => {
-    if (err) return create400(res, err);
-
-    patient
-      .save()
-      .then((patient) => res.json(patient.toObject()))
-      .catch((err) => create500(res, err));
-  });
 }

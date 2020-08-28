@@ -1,20 +1,19 @@
+import { compressToUTF16 } from "lz-string";
+import { getColor } from "@pranavraut033/js-utils";
+import { create400, create500 } from "@pranavraut033/js-utils/utils/httpErrors";
 import UserContact from "../models/UserContact";
 import Patient from "../models/Patient";
 
-import { getPatientColor } from "../utils";
-import { compressToUTF16 } from "lz-string";
-import { create400, create500 } from "../utils/httpErrors";
-
 export async function getContacts(req, res) {
   let contacts = await UserContact.find({ addedBy: req.user._id });
-  let patients = await Patient.find({ addedBy: req.user._id }).select(
+  const patients = await Patient.find({ addedBy: req.user._id }).select(
     "-addedBy -emergencyContacts -__v"
   );
 
   contacts = [
     ...contacts.map((ev) => ({
       ...ev.toObject(),
-      color: getPatientColor(ev._id),
+      color: getColor(ev._id),
     })),
     ...patients
       .map((ev) => ev.toObject())
@@ -22,7 +21,7 @@ export async function getContacts(req, res) {
         ...patient,
         type: "patient",
         autoAdded: true,
-        color: getPatientColor(patient._id),
+        color: getColor(patient._id),
         name: { ...patient.name, prefix: patient.prefix },
         displayName: patient.fullname || patient.phone || patient.email,
       })),
@@ -35,18 +34,18 @@ export async function getContacts(req, res) {
 }
 
 export async function createContact(req, res) {
-  let contact = new UserContact(req.body);
-  let error = contact.validateSync();
+  const contact = new UserContact(req.body);
+  const error = contact.validateSync();
 
-  if (error) return create400(res, "Validtion failed: " + error.message, error);
+  if (error) return create400(res, `Validtion failed: ${error.message}`, error);
   await contact.save();
 
   res.json(contact.toObject());
 }
 
 export async function updateContact(req, res) {
-  let Model = req.queryParams.isPatient == "true" ? Patient : UserContact;
-  let updates = Object.assign({}, req.body);
+  const Model = req.queryParams.isPatient === "true" ? Patient : UserContact;
+  const updates = { ...req.body };
 
   // correction
   if (req.queryParams.isPatient) {
@@ -55,16 +54,16 @@ export async function updateContact(req, res) {
 
   Model.findOneAndUpdate({ _id: req.params.id }, updates, { new: true })
     .then((model) =>
-      req.queryParams.isPatient == "true"
+      req.queryParams.isPatient === "true"
         ? {
             ...model.toObject(),
             type: "patient",
             autoAdded: true,
-            color: getPatientColor(model._id),
+            color: getColor(model._id),
             name: { ...model.name, prefix: model.prefix },
             displayName: model.fullname || model.phone || model.email,
           }
-        : { ...model.toObject(), color: getPatientColor(model._id) }
+        : { ...model.toObject(), color: getColor(model._id) }
     )
     .then((object) => res.json(object))
     .catch((err) => create500(res, err));

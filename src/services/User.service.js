@@ -1,30 +1,33 @@
+import {
+  create500,
+  create409,
+  create400,
+} from "@pranavraut033/js-utils/utils/httpErrors";
 import User from "../models/User";
 
-import { create500, create409, create400 } from "../utils/httpErrors";
-
-export function create(req, res) {
-  let user = req.body;
+export function createUser(req, res) {
+  const user = req.body;
 
   new User(user)
     .save()
-    .then((user) => res.json(user.toObject()))
+    .then((_user) => res.json(_user.toObject()))
     .catch((err) => {
-      if (err.name == "MongoError" && err.code == 11000) {
+      if (err.name === "MongoError" && err.code === 11000) {
         create409(
           res,
-          "User with " +
-            (err.message.indexOf("username") != -1
+          `User with ${
+            err.message.indexOf("username") !== -1
               ? `username '${user.username}'`
-              : `email '${user.email}'`) +
-            " already exists.",
+              : `email '${user.email}'`
+          } already exists.`,
           err
         );
       } else create500(res, err);
     });
 }
 
-export function update(req, res) {
-  for (var attr in req.body.updates) req.user[attr] = req.body.updates[attr];
+export function updateUser(req, res) {
+  Object.assign(req.user, req.body.updates);
 
   req.user
     .save()
@@ -38,10 +41,8 @@ export function update(req, res) {
     );
 }
 
-function _delete(req, res) {
+export function deleteUser(req, res) {
   User.deleteOne({ _id: req.parmas.id })
     .then((result) => res.json(result))
     .catch((err) => create500(res, err));
 }
-
-export { _delete as delete };

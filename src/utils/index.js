@@ -1,12 +1,7 @@
-import stc from "string-to-color";
+import { getDistinct } from "@pranavraut033/js-utils/utils/list";
 
 export const isProduction = () => process.env.NODE_ENV === "production";
 
-let colorMap = {};
-/**
- *
- * @param {String} patientId
- */
-export function getPatientColor(patientId) {
-  return colorMap[patientId] || (colorMap[patientId] = stc(patientId));
+export function getDistinctProp(array, mapper) {
+  return getDistinct(array.map(mapper).filter((ev) => !!ev));
 }

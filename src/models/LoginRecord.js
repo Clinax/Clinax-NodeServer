@@ -1,10 +1,10 @@
 import { Schema, model } from "mongoose";
-import { user } from "./types";
 import validate from "mongoose-validator";
+import { user } from "./types";
 
 const loginRecordSchema = new Schema(
   {
-    user: user,
+    user,
     userAgent: String,
     ip: {
       type: String,

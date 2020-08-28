@@ -1,11 +1,11 @@
-require("dotenv").config();
-
 import mongoose from "mongoose";
 import { isProduction } from "../utils";
 
+require("dotenv").config();
+
 mongoose.Promise = global.Promise;
 
-const mongoUrl = isProduction()
+const mongoUrl = !isProduction()
   ? process.env.MONGODB_URL
   : process.env.MONGODB_URL_DEBUG;
 
@@ -22,7 +22,7 @@ mongoose
   })
   .catch((err) => {
     console.error(
-      "Could not connect to the database (" + mongoUrl + "). Exiting now...",
+      `Could not connect to the database (${mongoUrl}). Exiting now...`,
       err
     );
     process.exit();
