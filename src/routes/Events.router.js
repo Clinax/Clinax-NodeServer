@@ -18,4 +18,5 @@ router.get("/followUp/events", authenticate, getFollowUpsMinimal);
 
 router.put("/appointment/:appointmentId", authenticate, updateAppointment);
 router.delete("/appointment/:appointmentId", authenticate, deleteAppointment);
+
 export default router;

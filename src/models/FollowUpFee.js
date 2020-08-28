@@ -4,7 +4,7 @@ import { amountType } from "./types";
 const feeSchema = new Schema(
   {
     patient: { type: Schema.Types.ObjectId, ref: "patient" },
-    followup: { type: Schema.Types.ObjectId, ref: "followUp" },
+    followUp: { type: Schema.Types.ObjectId, ref: "followUp" },
     paid: { type: Boolean, default: () => false },
     visitingCharges: amountType,
     extraCharges: [{ name: String, amountType }],

@@ -9,6 +9,7 @@ const router = Router();
 router.get("/case/:patientId", authenticate, getPatientWithCase, getCase);
 router.put("/case/:patientId", authenticate, getPatientWithCase, updateCase);
 router.post("/case/:patientId", authenticate, findPatient, createCase);
+
 router.post(
   "/followUp/:patientId",
   authenticate,
@@ -16,4 +17,5 @@ router.post(
   createFollowUp
 );
 router.put("/followUp/:followUpId", authenticate, updateFollowUp);
+
 export default router;

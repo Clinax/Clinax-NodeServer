@@ -5,13 +5,20 @@ import FollowUp from "../models/FollowUp";
 
 export async function createFollowUp(req, res) {
   const _case = req.patient.case;
+
   let now = moment(new Date());
   now = now.year() + now.dayOfYear();
-  _case.followUps.forEach((followUp) => {
-    const f = moment(followUp.createdAt);
-    if (now === f.year() + f.dayOfYear())
+
+  for (let i = 0; i < _case.followUps.length; i++) {
+    const followUp = _case.followUps[i];
+
+    let followUpDate = moment(followUp.createdAt);
+    followUpDate = followUpDate.year() + followUpDate.dayOfYear();
+
+    if (now === followUpDate)
       return create500(res, "Followup for today exist!");
-  });
+  }
+
   const followUp = new FollowUp(req.body);
 
   const err = await followUp.validate();
@@ -39,5 +46,5 @@ export function updateFollowUp(req, res) {
       });
       res.send(followUp.toObject());
     })
-    .catch((err) => create500(res, err, "Failed to update followup"));
+    .catch((err) => create500(res, err, "Failed to update followUp"));
 }
