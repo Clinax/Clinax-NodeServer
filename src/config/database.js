@@ -5,7 +5,7 @@ require("dotenv").config();
 
 mongoose.Promise = global.Promise;
 
-const mongoUrl = !isProduction()
+const mongoUrl = isProduction()
   ? process.env.MONGODB_URL
   : process.env.MONGODB_URL_DEBUG;
 
