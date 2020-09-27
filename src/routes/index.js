@@ -4,6 +4,7 @@ import CaseRouter from "./Case.router";
 import UserRouter from "./User.router";
 import EventsRouter from "./Events.router";
 import ContactRouter from "./Contact.router";
+import InventoryTodoRouter from "./InventoryTodo.router";
 
 export default function (app) {
   app.use(AuthRouter);
@@ -17,4 +18,6 @@ export default function (app) {
   app.use(EventsRouter);
 
   app.use(ContactRouter);
+
+  app.use(InventoryTodoRouter);
 }
